@@ -5,6 +5,7 @@ import armory.trait.physics.RigidBody;
 import iron.Scene;
 import iron.math.Vec4;
 import iron.object.Object;
+import iron.system.Input;
 
 class Game extends iron.Trait {
     
@@ -14,6 +15,10 @@ class Game extends iron.Trait {
     static inline var numBlocks = 64;
 
     var blocks : Array<Object>;
+
+    var mouse : Mouse;
+    var camFocus : Object;
+    var lastMouseX = 0.0;
 
     public function new() {
         super();
@@ -30,6 +35,12 @@ class Game extends iron.Trait {
                 });
             }
            spawnBlock();
+           #if kha_html5
+           js.Browser.window.oncontextmenu = e -> e.preventDefault();
+           #end
+           camFocus = Scene.active.getEmpty('Focus');
+           mouse = Input.getMouse();
+           notifyOnUpdate(update);
         });
     }
 
@@ -57,6 +68,20 @@ class Game extends iron.Trait {
             b.transform.buildMatrix();
             var body = b.getTrait( RigidBody );
             body.syncTransform();
+        }
+    }
+
+    function update() {
+        if( mouse.down("right")) {
+            //trace("RORARTWE START");
+            //rotateStart.set( mouse.x, mouse.y );
+            if( lastMouseX != 0 ) {
+                var moved = mouse.x-lastMouseX;
+                camFocus.transform.rotate(Vec4.zAxis(), moved/200 );
+            }
+            lastMouseX = mouse.x;
+        } else {
+            lastMouseX = 0;
         }
     }
 }

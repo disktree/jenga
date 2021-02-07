@@ -1,22 +1,22 @@
 // Auto-generated
-let project = new Project('jenga_1_0_21');
+let project = new Project('jenga_1_0_33');
 
 project.addSources('Sources');
 project.addLibrary("../../../../sdk/armsdk/armory");
 project.addLibrary("../../../../sdk/armsdk/iron");
 project.addLibrary("../../../../sdk/armsdk/lib/haxebullet");
-project.addAssets("../../../sdk/armsdk/lib/haxebullet/ammo/ammo.wasm.js", { notinlist: true });
-project.addAssets("../../../sdk/armsdk/lib/haxebullet/ammo/ammo.wasm.wasm", { notinlist: true });
-project.addParameter('jenga.Menu');
-project.addParameter("--macro keep('jenga.Menu')");
-project.addParameter('armory.trait.physics.bullet.PhysicsWorld');
-project.addParameter("--macro keep('armory.trait.physics.bullet.PhysicsWorld')");
-project.addParameter('jenga.Game');
-project.addParameter("--macro keep('jenga.Game')");
-project.addParameter('armory.trait.physics.bullet.RigidBody');
-project.addParameter("--macro keep('armory.trait.physics.bullet.RigidBody')");
+project.addAssets("../../../sdk/armsdk/lib/haxebullet/ammo/ammo.js", { notinlist: true });
+project.addParameter('-dce full');
 project.addParameter('armory.trait.PhysicsDrag');
 project.addParameter("--macro keep('armory.trait.PhysicsDrag')");
+project.addParameter('armory.trait.physics.bullet.RigidBody');
+project.addParameter("--macro keep('armory.trait.physics.bullet.RigidBody')");
+project.addParameter('armory.trait.physics.bullet.PhysicsWorld');
+project.addParameter("--macro keep('armory.trait.physics.bullet.PhysicsWorld')");
+project.addParameter('jenga.Menu');
+project.addParameter("--macro keep('jenga.Menu')");
+project.addParameter('jenga.Game');
+project.addParameter("--macro keep('jenga.Game')");
 project.addShaders("build_jenga/compiled/Shaders/*.glsl", { noembed: false});
 project.addAssets("build_jenga/compiled/Assets/**", { notinlist: true });
 project.addAssets("build_jenga/compiled/Shaders/*.arm", { notinlist: true });
@@ -51,19 +51,18 @@ project.addDefine('rp_supersampling=1');
 project.addDefine('rp_ssgi=RTAO');
 project.addDefine('rp_bloom');
 project.addDefine('rp_ssr');
-project.addDefine('rp_voxelao');
-project.addDefine('rp_voxelgi_resolution=128');
-project.addDefine('rp_voxelgi_resolution_z=1.0');
 project.addDefine('rp_motionblur=Object');
 project.addDefine('rp_gbuffer2');
 project.addDefine('arm_physics');
 project.addDefine('arm_bullet');
-project.addDefine('arm_noembed');
+project.addDefine('arm_published');
 project.addDefine('arm_soundcompress');
 project.addDefine('arm_audio');
 project.addDefine('arm_ui');
 project.addDefine('arm_skin');
 project.addDefine('arm_particles');
+project.addDefine('arm_loadscreen');
+project.addDefine('arm_resizable');
 
 
 resolve(project);
