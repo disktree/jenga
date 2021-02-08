@@ -1,11 +1,7 @@
 package jenga;
 
-import iron.Scene;
-import iron.data.Data;
-import kha.System;
 import zui.Id;
 import zui.Themes;
-import zui.Zui;
 
 class Menu extends iron.Trait {
     
@@ -40,7 +36,7 @@ class Menu extends iron.Trait {
         g.opacity = 1;
         var hwin = Id.handle();
         hwin.redraws = 1;
-        if( ui.window( hwin, 4, 4, 64, 24, false ) ) {
+        if( ui.window( hwin, 1, 1, 64, 24, false ) ) {
             if( ui.button( "JENGA!", Left ) ) game.start();
         }
         ui.end();

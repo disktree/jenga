@@ -1,13 +1,5 @@
 package jenga;
 
-import armory.trait.physics.PhysicsWorld;
-import armory.trait.physics.RigidBody;
-import iron.math.Mat4;
-import iron.math.RayCaster;
-import iron.math.Vec4;
-import iron.system.Input;
-import iron.Trait;
-
 class BlockDrag extends Trait {
 
     static var start = new Vec4();
@@ -16,10 +8,11 @@ class BlockDrag extends Trait {
     static var v = new Vec4();
 	static var m = Mat4.identity();
 	static var first = true;
+	
+    public var pickedBody(default,null) : RigidBody = null;
 
 	var pickConstraint : bullet.Bt.Generic6DofConstraint = null;
 	var pickDist : Float;
-	var pickedBody : RigidBody = null;
 
 	var rayFrom : bullet.Bt.Vector3;
 	var rayTo : bullet.Bt.Vector3;

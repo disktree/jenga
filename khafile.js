@@ -1,5 +1,5 @@
 // Auto-generated
-let project = new Project('jenga_1_0_33');
+let project = new Project('jenga_1_0_56');
 
 project.addSources('Sources');
 project.addLibrary("../../../../sdk/armsdk/armory");
@@ -7,16 +7,16 @@ project.addLibrary("../../../../sdk/armsdk/iron");
 project.addLibrary("../../../../sdk/armsdk/lib/haxebullet");
 project.addAssets("../../../sdk/armsdk/lib/haxebullet/ammo/ammo.js", { notinlist: true });
 project.addParameter('-dce full');
-project.addParameter('armory.trait.PhysicsDrag');
-project.addParameter("--macro keep('armory.trait.PhysicsDrag')");
-project.addParameter('armory.trait.physics.bullet.RigidBody');
-project.addParameter("--macro keep('armory.trait.physics.bullet.RigidBody')");
+project.addParameter('jenga.BlockDrag');
+project.addParameter("--macro keep('jenga.BlockDrag')");
 project.addParameter('armory.trait.physics.bullet.PhysicsWorld');
 project.addParameter("--macro keep('armory.trait.physics.bullet.PhysicsWorld')");
 project.addParameter('jenga.Menu');
 project.addParameter("--macro keep('jenga.Menu')");
 project.addParameter('jenga.Game');
 project.addParameter("--macro keep('jenga.Game')");
+project.addParameter('armory.trait.physics.bullet.RigidBody');
+project.addParameter("--macro keep('armory.trait.physics.bullet.RigidBody')");
 project.addShaders("build_jenga/compiled/Shaders/*.glsl", { noembed: false});
 project.addAssets("build_jenga/compiled/Assets/**", { notinlist: true });
 project.addAssets("build_jenga/compiled/Shaders/*.arm", { notinlist: true });
@@ -26,12 +26,11 @@ project.addAssets("../../../sdk/armsdk/armory/Assets/smaa_search.png", { notinli
 project.addAssets("Bundled/index.html", { notinlist: true });
 project.addAssets("Bundled/mono.ttf", { notinlist: false });
 project.addAssets("Data/Wood023_1K-JPG/Wood023_1K_Color.jpg", { notinlist: true });
-project.addAssets("Data/Wood023_1K-JPG/Wood023_1K_Displacement.jpg", { notinlist: true });
 project.addAssets("Data/Wood023_1K-JPG/Wood023_1K_Normal.jpg", { notinlist: true });
 project.addAssets("Data/Wood023_1K-JPG/Wood023_1K_Roughness.jpg", { notinlist: true });
 project.addAssets("Data/checker_rough.png", { notinlist: true });
+project.addAssets("Data/circus_arena_1k.hdr", { notinlist: true });
 project.addAssets("Data/gridbox2.png", { notinlist: true });
-project.addAssets("Data/studio_small_05_1k.hdr", { notinlist: true });
 project.addLibrary("../../../../sdk/armsdk/lib/zui");
 project.addAssets("../../../sdk/armsdk/armory/Assets/font_default.ttf", { notinlist: false });
 project.addDefine('arm_deferred');

@@ -2,7 +2,7 @@
 package ;
 class Main {
     public static inline var projectName = 'jenga';
-    public static inline var projectVersion = '1.0.33';
+    public static inline var projectVersion = '1.0.56';
     public static inline var projectPackage = 'jenga';
     public static inline var voxelgiVoxelSize = 16.0 / 128;
     public static inline var voxelgiHalfExtents = 8;
@@ -10,7 +10,7 @@ class Main {
         iron.object.BoneAnimation.skinMaxBones = 8;
             iron.object.LightObject.cascadeCount = 4;
             iron.object.LightObject.cascadeSplitFactor = 0.800000011920929;
-        armory.system.Starter.numAssets = 31;
+        armory.system.Starter.numAssets = 30;
         armory.system.Starter.drawLoading = armory.trait.internal.LoadingScreen.render;
         armory.system.Starter.main(
             'Scene',

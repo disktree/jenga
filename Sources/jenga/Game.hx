@@ -1,12 +1,5 @@
 package jenga;
 
-import armory.trait.physics.PhysicsWorld;
-import armory.trait.physics.RigidBody;
-import iron.Scene;
-import iron.math.Vec4;
-import iron.object.Object;
-import iron.system.Input;
-
 class Game extends iron.Trait {
     
     static inline var blockX = 0.41;
@@ -19,14 +12,28 @@ class Game extends iron.Trait {
     var mouse : Mouse;
     var camFocus : Object;
     var lastMouseX = 0.0;
+    var lastMouseY = 0.0;
+
+    var blockDragged : Object;
 
     public function new() {
         super();
         notifyOnInit( () -> {
+            #if kha_html5
+            js.Browser.window.oncontextmenu = e -> e.preventDefault();
+            #end
+            camFocus = Scene.active.getEmpty('Focus');
+            mouse = Input.getMouse();
             blocks = [];
             function spawnBlock() {
                 Scene.active.spawnObject( 'Block', null, obj -> {
+                    obj.name = 'Block_'+blocks.length;
                     blocks.push( obj );
+                    /*
+                    var i = blocks.length;
+                   Event.add('drag', () -> {
+                        trace("DRAG "+obj.name );
+                    }, i ); */
                     if( blocks.length == numBlocks ) {
                         start();
                     } else {
@@ -35,16 +42,19 @@ class Game extends iron.Trait {
                 });
             }
            spawnBlock();
-           #if kha_html5
-           js.Browser.window.oncontextmenu = e -> e.preventDefault();
-           #end
-           camFocus = Scene.active.getEmpty('Focus');
-           mouse = Input.getMouse();
            notifyOnUpdate(update);
         });
     }
 
     public function start( ) {
+
+        //var cam = Scene.active.camera;
+        //trace(cam);
+        //cam.transform.rotate( Vec4.zAxis(), Math.PI/2 );
+        camFocus.transform.rot.set(0,0,0,1);
+        camFocus.transform.rotate( Vec4.zAxis(), Math.PI/4 );
+        camFocus.transform.buildMatrix();
+
         var ix = 0;
         var iz = 0;
         var rz = false;
@@ -72,16 +82,35 @@ class Game extends iron.Trait {
     }
 
     function update() {
-        if( mouse.down("right")) {
-            //trace("RORARTWE START");
-            //rotateStart.set( mouse.x, mouse.y );
-            if( lastMouseX != 0 ) {
-                var moved = mouse.x-lastMouseX;
-                camFocus.transform.rotate(Vec4.zAxis(), moved/200 );
+        blockDragged = null;
+        for( block in blocks ) {
+            var drag = block.getTrait(BlockDrag);
+            if( drag.pickedBody != null ) {
+                blockDragged = drag.pickedBody.object;
+                //trace(drag.pickedBody.object.name);
+
             }
-            lastMouseX = mouse.x;
+        }
+        if( blockDragged != null ) {
+            //..
+
         } else {
-            lastMouseX = 0;
+            if( mouse.down("right")) {
+                //trace("RORARTWE START");
+                //rotateStart.set( mouse.x, mouse.y );
+                if( lastMouseX != 0 ) {
+                    var moved = mouse.x-lastMouseX;
+                    camFocus.transform.rotate(Vec4.zAxis(), moved/200 );
+                }
+                lastMouseX = mouse.x;
+                /* if( lastMouseY != 0 ) {
+                    var moved = mouse.y-lastMouseY;
+                    camFocus.transform.rotate(Vec4.yAxis(), moved/1000 );
+                }
+                lastMouseY = mouse.y; */
+            } else {
+                lastMouseX = 0;
+            }
         }
     }
 }
