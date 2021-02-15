@@ -32,8 +32,6 @@ class BlockDrag extends Trait {
 		var mouse = Input.getMouse();
 		if (mouse.started()) {
 
-			trace("CXC");
-
 			var b = physics.pickClosest(mouse.x, mouse.y);
 			if (b != null && b.mass > 0 && !b.body.isKinematicObject() && b.object.getTrait(BlockDrag) != null) {
 

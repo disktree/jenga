@@ -13,6 +13,7 @@ import iron.system.Input;
 import iron.system.Time;
 import iron.system.Tween;
 
+import kha.Font;
 import kha.System;
 
 import zui.Zui;
