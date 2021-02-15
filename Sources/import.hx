@@ -10,6 +10,8 @@ import iron.math.RayCaster;
 import iron.math.Vec4;
 import iron.object.Object;
 import iron.system.Input;
+import iron.system.Time;
+import iron.system.Tween;
 
 import kha.System;
 

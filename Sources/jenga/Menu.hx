@@ -36,8 +36,10 @@ class Menu extends iron.Trait {
         g.opacity = 1;
         var hwin = Id.handle();
         hwin.redraws = 1;
-        if( ui.window( hwin, 1, 1, 64, 24, false ) ) {
+        if( ui.window( hwin, 1, 1, 200, 200, false ) ) {
             if( ui.button( "JENGA!", Left ) ) game.start();
+            //if( ui.button( "CLEAR", Left ) ) game.clear();
+            if( ui.button( "CREATE", Left ) ) game.create(32);
         }
         ui.end();
         g.begin( false );
