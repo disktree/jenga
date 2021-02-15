@@ -2,9 +2,9 @@ package jenga;
 
 class Game extends iron.Trait {
     
-    static inline var blockX = 0.41;
+    static inline var blockX = 0.4;
     static inline var blockY = 2.0;
-    static inline var blockZ = 0.305;
+    static inline var blockZ = 0.3;
     static inline var numBlocks = 64;
 
     var blocks : Array<Object>;
@@ -21,11 +21,12 @@ class Game extends iron.Trait {
         notifyOnInit( () -> {
             #if kha_html5
             js.Browser.window.oncontextmenu = e -> e.preventDefault();
+            Scene.active.world.raw.probe.strength = 0.4; // HACK
             #end
             camFocus = Scene.active.getEmpty('Focus');
             mouse = Input.getMouse();
             blocks = [];
-            create(64);
+            create(68);
             notifyOnUpdate(update);
         });
     }
@@ -67,7 +68,7 @@ class Game extends iron.Trait {
         /* 
         var blocks = this.blocks.slice( 0, 32 );
         for( i in 32...blocks.length ) {
-            blocks[i].remove();
+            blocks[i].remove()
         }
         */
 
@@ -81,38 +82,44 @@ class Game extends iron.Trait {
 
         //var cam = Scene.active.camera;
         //cam.transform.rotate( Vec4.zAxis(), Math.PI/2 );
+
         camFocus.transform.rot.set(0,0,0,1);
         camFocus.transform.rotate( Vec4.zAxis(), Math.PI/4 );
         camFocus.transform.buildMatrix();
 
-        var ix = 0, iz = 0;
+        var rows = Std.int(blocks.length/4);
+        var ranPosFactor = 0.005 + Math.random() * 0.01;
+        var ranRotFactor = 0.02 + Math.random()*0.04;
+
+        var ix = 0;
+        var px = 0.0;
+        var pz = blockZ/2;
         var rz = false;
-        var px = - (blockX*2 + blockX/2), py = px;
-        var randomOffsetFactor = 0.01;
-        for( i in 0...blocks.length ) {
-            var b = blocks[i];
-            b.transform.loc.set(0,0,0);
-            b.transform.rot = new iron.math.Quat();
-            if( i != 0 && i % 4 == 0 ) {
-                ix = 0;
-                px = py = - (blockX*2 + blockX/2);
-                rz = !rz;
-                iz++;
+
+        for( iz in 0...rows ) {
+            px = -(blockX*2 + blockX/2);
+            for( ix in 0...4 ) {
+                var b = blocks[(iz*4)+ix];
+                b.transform.loc.set(0,0,0);
+                b.transform.rot = new iron.math.Quat();
+                var ranRot = - ranRotFactor + Math.random()*(ranRotFactor*2);
+                var ranPos = - ranPosFactor + Math.random()*(ranPosFactor*2);
+                if( rz ) {
+                    b.transform.rotate( Vec4.zAxis(), Math.PI/2 + ranRot );
+                    px += blockX + ranPos;
+                    b.transform.loc.y = px;
+                } else {
+                    b.transform.rotate( Vec4.zAxis(), ranRot );
+                    px += blockX + ranPos;
+                    b.transform.loc.x = px;
+                }
+                b.transform.loc.z = pz;
+                b.transform.buildMatrix();
+                var body = b.getTrait( RigidBody );
+                body.syncTransform();
             }
-            if( rz ) {
-                b.transform.rotate( Vec4.zAxis(), Math.PI/2 );
-                py += blockX + Math.random() * randomOffsetFactor;
-                b.transform.loc.y = py;
-            } else {
-                px += blockX + Math.random() * randomOffsetFactor;
-                b.transform.loc.x = px;
-                //b.transform.loc.x = (ix*blockX) - ((4*blockX)/2) + blockX/2;
-            }
-            ix++;
-            b.transform.loc.z = iz * blockZ + (blockZ/2);
-            b.transform.buildMatrix();
-            var body = b.getTrait( RigidBody );
-            body.syncTransform();
+            pz += blockZ+0.001;
+            rz = !rz;
         }
     }
 
