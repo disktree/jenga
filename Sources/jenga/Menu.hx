@@ -12,10 +12,9 @@ class Menu extends iron.Trait {
     public function new() {
         super();
         notifyOnInit( () -> {
-            game = Scene.active.getTrait( jenga.Game );
-            Data.getFont( 'mono.ttf', font -> {
-                this.font = font;
-                ui = new Zui( { font : font } );
+            UI.init( () -> {
+                ui = UI.create();
+                game = Scene.active.getTrait( jenga.Game );
                 notifyOnUpdate( update );
                 notifyOnRender2D( render2D );
             });
