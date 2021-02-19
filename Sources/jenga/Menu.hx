@@ -5,7 +5,6 @@ import zui.Themes;
 
 class Menu extends iron.Trait {
     
-    var font : Font;
     var ui : Zui;
     var game : Game;
 
@@ -49,10 +48,10 @@ class Menu extends iron.Trait {
         ui.end();
 
         g.color = 0xff000000;
-		g.font = font;
+		g.font = UI.font;
 		g.fontSize = Std.int(12);
         var text = 'v'+Main.projectVersion;
-        var textWidth = font.width( g.fontSize, text );
+        var textWidth = UI.font.width( g.fontSize, text );
         g.drawString( text, sw-(textWidth + (g.fontSize*1.1)), sh-(g.fontSize*1.5) ); 
 
         g.begin( false );
