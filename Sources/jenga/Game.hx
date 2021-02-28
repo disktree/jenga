@@ -2,9 +2,10 @@ package jenga;
 
 class Game extends iron.Trait {
 
-    var blocks : Array<Object>;
-    var blockDim : Vec4;
-    var blockDragged : Object;
+    public var blocks(default,null) : Array<Object>;
+    public var blockDragged(default,null) : Object;
+    public var blockDim(default,null)  : Vec4;
+
     var camFocus : Object;
     var mouse : Mouse;
     var lastMouseX = 0.0;
@@ -14,13 +15,12 @@ class Game extends iron.Trait {
         super();
         notifyOnInit( () -> {
             #if kha_html5
-            js.Browser.window.oncontextmenu = e -> e.preventDefault();
             Scene.active.world.raw.probe.strength = 0.3; // HACK
             #end
             camFocus = Scene.active.getEmpty('Focus');
             mouse = Input.getMouse();
             blocks = [];
-            create(60);
+            create(64);
             notifyOnUpdate(update);
         });
     }
@@ -46,7 +46,6 @@ class Game extends iron.Trait {
             Scene.active.spawnObject( blockName, container, obj -> {
                 if( blockDim == null ) {
                     blockDim = obj.transform.dim;
-                    trace(blockDim);
                 }
                 obj.name = 'Block_'+blocks.length;
                 // obj.addTrait( new BlockDrag() );
@@ -64,13 +63,11 @@ class Game extends iron.Trait {
 
     public function start() {
 
-        /*
-        _blocks = _blocks.slice( 0, 32 );
-        for( i in 32...blocks.length ) {
-            PhysicsWorld.active.removeRigidBody();
-            blocks[i].remove();
+        for( block in blocks ) {
+            var body = block.getTrait(RigidBody);
+            body.setAngularVelocity(0,0,0);
+            body.setLinearVelocity(0,0,0);
         }
-        */
 
         camFocus.transform.rot.set(0,0,0,1);
         camFocus.transform.rotate( Vec4.zAxis(), Math.PI/4 );
