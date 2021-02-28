@@ -6,16 +6,25 @@ import zui.Themes;
 class Menu extends iron.Trait {
     
     var ui : Zui;
+    var mouse : Mouse;
     var game : Game;
+    var opacity = 1.0;
 
     public function new() {
         super();
         notifyOnInit( () -> {
+            mouse = Input.getMouse();
             UI.init( () -> {
                 ui = UI.create();
                 game = Scene.active.getTrait( jenga.Game );
                 notifyOnUpdate( update );
                 notifyOnRender2D( render2D );
+                Tween.to({
+                    target: this,
+                    props: { opacity: 0.0 },
+                    duration: 1.0,
+                    delay: 1.0
+                });
             });
         });
     }
@@ -37,21 +46,27 @@ class Menu extends iron.Trait {
 
 		ui.begin( g );
 		//ui.beginRegion( g );
-        g.opacity = 1;
+        g.opacity = opacity;
         var hwin = Id.handle();
         hwin.redraws = 1;
-        if( ui.window( hwin, 1, 1, 120, 40, false ) ) {
-            if( ui.button( "JENGA!", Left ) ) game.start();
-            //if( ui.button( "CLEAR", Left ) ) game.clear();
-            //if( ui.button( "CREATE", Left ) ) game.create(32);
+        if( ui.window( hwin, 1, 256, sw, 512, false ) ) {
+            //ui.ops.theme.TEXT_COL = 0xff0000ff;
+            ui.button('JENGA',Center);
         }
         ui.end();
 
+        /* g.color = 0xffffffff;
+		g.font = UI.fontTitle;
+		g.fontSize = Std.int(256);
+        var text = 'JENGA';
+        var textWidth = UI.fontTitle.width( g.fontSize, text );
+        g.drawString( text, sw/2 - textWidth/2, sh/2 - g.fontSize/2 );  */
+       
         g.color = 0xff000000;
-		g.font = UI.font;
+		g.font = UI.fontRegular;
 		g.fontSize = Std.int(12);
         var text = 'v'+Main.projectVersion;
-        var textWidth = UI.font.width( g.fontSize, text );
+        var textWidth = UI.fontRegular.width( g.fontSize, text );
         g.drawString( text, sw-(textWidth + (g.fontSize*1.1)), sh-(g.fontSize*1.5) ); 
 
         g.begin( false );
