@@ -6,7 +6,8 @@ class Game extends iron.Trait {
     public var blockDragged(default,null) : Object;
     public var blockDim(default,null)  : Vec4;
 
-    var camFocus : Object;
+    var camRigZ : Object;
+    var camRigX : Object;
     var mouse : Mouse;
     var lastMouseX = 0.0;
     var lastMouseY = 0.0;
@@ -15,9 +16,10 @@ class Game extends iron.Trait {
         super();
         notifyOnInit( () -> {
             #if kha_html5
-            Scene.active.world.raw.probe.strength = 0.3; // HACK
+            Scene.active.world.raw.probe.strength = 0.2; // HACK
             #end
-            camFocus = Scene.active.getEmpty('Focus');
+            camRigZ = Scene.active.getEmpty('CameraRigZ');
+            camRigX = Scene.active.getEmpty('CameraRigX');
             mouse = Input.getMouse();
             blocks = [];
             create(64);
@@ -40,7 +42,7 @@ class Game extends iron.Trait {
 
     public function create( numBlocks : Int ) {
         clear();
-        var blockName = "Block2";
+        var blockName = "Block3";
         var container = Scene.active.getEmpty('BlockContainer');
         function spawnBlock() {
             Scene.active.spawnObject( blockName, container, obj -> {
@@ -69,9 +71,9 @@ class Game extends iron.Trait {
             body.setLinearVelocity(0,0,0);
         }
 
-        camFocus.transform.rot.set(0,0,0,1);
-        camFocus.transform.rotate( Vec4.zAxis(), Math.PI/4 );
-        camFocus.transform.buildMatrix();
+        camRigZ.transform.rot.set(0,0,0,1);
+        camRigZ.transform.rotate( Vec4.zAxis(), Math.PI/4 );
+        camRigZ.transform.buildMatrix();
 
         var rows = Std.int(blocks.length/4);
         var ranPosFactor = 0.005 + Math.random() * 0.01;
@@ -120,19 +122,42 @@ class Game extends iron.Trait {
                 //trace(drag.pickedBody.object.name);
             }
         }
+
+        var rotZ = 0.0;
+        var rotX = 0.0;
+
         if( blockDragged != null ) {
             //..
         } else {
             if( mouse.down("right")) {
-                //rotateStart.set( mouse.x, mouse.y );
                 if( lastMouseX != 0 ) {
-                    var moved = mouse.x-lastMouseX;
-                    camFocus.transform.rotate(Vec4.zAxis(), moved/400 );
+                    var moved = mouse.x - lastMouseX;
+                    if( moved != 0 ) {
+                        rotZ = moved / 200;
+                    }
+                }
+                if( lastMouseY != 0 ) {
+                    var moved = mouse.y - lastMouseY;
+                    if( moved != 0 ) {
+                        rotX = moved / 2000;
+                    }
                 }
                 lastMouseX = mouse.x;
+                lastMouseY = mouse.y;
+
             } else {
                 lastMouseX = 0;
+                lastMouseY = 0;
             }
         }
+
+        camRigZ.transform.rotate( new Vec4( 0,0,rotZ,1), 1 );
+        
+        var rx = camRigX.transform.rot.x + rotX;
+        if( rx > 0.3 ) rx = 0.3;
+        else if( rx < -0.3 ) rx = -0.3;
+        camRigX.transform.rot.x = rx;
+
+        camRigX.transform.buildMatrix();
     }
 }
