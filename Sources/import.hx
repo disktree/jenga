@@ -6,6 +6,7 @@ import iron.Scene;
 import iron.Trait;
 import iron.data.Data;
 import iron.math.Mat4;
+import iron.math.Quat;
 import iron.math.RayCaster;
 import iron.math.Vec4;
 import iron.object.Object;

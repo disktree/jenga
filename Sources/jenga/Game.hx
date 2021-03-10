@@ -1,6 +1,14 @@
 package jenga;
 
+typedef Config = {
+    var numBlocks : Int;
+    var blockObject : String;
+    //var ranPosFactor : Float;
+}
+
 class Game extends iron.Trait {
+
+    static inline var ROW_SIZE = 4;
 
     public var blocks(default,null) : Array<Object>;
     public var blockDragged(default,null) : Object;
@@ -14,6 +22,7 @@ class Game extends iron.Trait {
 
     public function new() {
         super();
+        trace( 'JENGA ${Main.projectVersion}' );
         notifyOnInit( () -> {
             #if kha_html5
             Scene.active.world.raw.probe.strength = 0.2; // HACK
@@ -22,7 +31,10 @@ class Game extends iron.Trait {
             camRigX = Scene.active.getEmpty('CameraRigX');
             mouse = Input.getMouse();
             blocks = [];
-            create(64);
+            create({
+                numBlocks: 72,
+                blockObject : "Block3"
+            }, start );
             notifyOnUpdate(update);
         });
     }
@@ -40,21 +52,17 @@ class Game extends iron.Trait {
         blocks = [];
     }
 
-    public function create( numBlocks : Int ) {
-        clear();
-        var blockName = "Block3";
+    public function create( config : Config, cb : Void->Void ) {
+        //clear();
+        var blockName = config.blockObject;
         var container = Scene.active.getEmpty('BlockContainer');
         function spawnBlock() {
             Scene.active.spawnObject( blockName, container, obj -> {
-                if( blockDim == null ) {
-                    blockDim = obj.transform.dim;
-                }
                 obj.name = 'Block_'+blocks.length;
-                // obj.addTrait( new BlockDrag() );
-                // trace("ADD DRAG");
                 blocks.push( obj );
-                if( blocks.length == numBlocks ) {
-                    start();
+                if( blocks.length == config.numBlocks ) {
+                    blockDim = blocks[0].transform.dim;
+                    cb();
                 } else {
                     spawnBlock();
                 }
@@ -75,21 +83,21 @@ class Game extends iron.Trait {
         camRigZ.transform.rotate( Vec4.zAxis(), Math.PI/4 );
         camRigZ.transform.buildMatrix();
 
-        var rows = Std.int(blocks.length/4);
+        var numRows = Std.int(blocks.length / ROW_SIZE);
         var ranPosFactor = 0.005 + Math.random() * 0.01;
-        var ranRotFactor = 0.02 + Math.random()*0.04;
+        var ranRotFactor = 0.02 + Math.random() * 0.04;
 
         var ix = 0;
         var px = 0.0;
         var pz = blockDim.z/2;
         var rz = false;
 
-        for( iz in 0...rows ) {
+        for( iz in 0...numRows ) {
             px = -(blockDim.x*2 + blockDim.x/2);
-            for( ix in 0...4 ) {
-                var b = blocks[(iz*4)+ix];
+            for( ix in 0...ROW_SIZE ) {
+                var b = blocks[(iz*ROW_SIZE)+ix];
                 b.transform.loc.set(0,0,0);
-                b.transform.rot = new iron.math.Quat();
+                b.transform.rot = new Quat();
                 var ranRot = - ranRotFactor + Math.random()*(ranRotFactor*2);
                 var ranPos = - ranPosFactor + Math.random()*(ranPosFactor*2);
                 if( rz ) {
@@ -106,7 +114,7 @@ class Game extends iron.Trait {
                 var body = b.getTrait( RigidBody );
                 body.syncTransform();
             }
-            pz += blockDim.z + 0.001;
+            pz += blockDim.z + 0.01;
             rz = !rz;
         }
     }
