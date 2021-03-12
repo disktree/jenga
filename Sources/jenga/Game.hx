@@ -9,6 +9,9 @@ typedef Config = {
 class Game extends iron.Trait {
 
     static inline var ROW_SIZE = 4;
+    static inline var ZOOM_SPEED = 0.4;
+    static inline var ZOOM_MIN = -4.0;
+    static inline var ZOOM_MAX = -9.0;
 
     public var blocks(default,null) : Array<Object>;
     public var blockDragged(default,null) : Object;
@@ -156,6 +159,15 @@ class Game extends iron.Trait {
             } else {
                 lastMouseX = 0;
                 lastMouseY = 0;
+            }
+
+            if( mouse.wheelDelta != 0 ) {
+                if( mouse.wheelDelta < 0 ) {
+                    if( Scene.active.camera.transform.loc.y < ZOOM_MIN ) Scene.active.camera.transform.loc.y += ZOOM_SPEED;
+                } else {
+                    if( Scene.active.camera.transform.loc.y > ZOOM_MAX ) Scene.active.camera.transform.loc.y -= ZOOM_SPEED;
+                }
+                Scene.active.camera.transform.buildMatrix();
             }
         }
 
