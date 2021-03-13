@@ -11,7 +11,9 @@ class Game extends iron.Trait {
     static inline var ROW_SIZE = 4;
     static inline var ZOOM_SPEED = 0.4;
     static inline var ZOOM_MIN = -4.0;
-    static inline var ZOOM_MAX = -9.0;
+    static inline var ZOOM_MAX = -8.0;
+    static inline var ROT_X_MIN = -0.3;
+    static inline var ROT_X_MAX = 0.2;
 
     public var blocks(default,null) : Array<Object>;
     public var blockDragged(default,null) : Object;
@@ -174,10 +176,9 @@ class Game extends iron.Trait {
         camRigZ.transform.rotate( new Vec4( 0,0,rotZ,1), 1 );
         
         var rx = camRigX.transform.rot.x + rotX;
-        if( rx > 0.3 ) rx = 0.3;
-        else if( rx < -0.3 ) rx = -0.3;
+        if( rx > ROT_X_MAX ) rx = ROT_X_MAX;
+        else if( rx < ROT_X_MIN ) rx = ROT_X_MIN;
         camRigX.transform.rot.x = rx;
-
         camRigX.transform.buildMatrix();
     }
 }
