@@ -10,6 +10,7 @@ class Game extends iron.Trait {
 
     static inline var ROW_SIZE = 4;
     static inline var ZOOM_SPEED = 0.4;
+    static inline var ZOOM_DEFAULT = -6.0;
     static inline var ZOOM_MIN = -4.0;
     static inline var ZOOM_MAX = -8.0;
     static inline var ROT_X_MIN = -0.3;
@@ -19,6 +20,7 @@ class Game extends iron.Trait {
     public var blockDragged(default,null) : Object;
     public var blockDim(default,null)  : Vec4;
 
+    var cam : CameraObject;
     var camRigZ : Object;
     var camRigX : Object;
     var mouse : Mouse;
@@ -32,6 +34,7 @@ class Game extends iron.Trait {
             #if kha_html5
             Scene.active.world.raw.probe.strength = 0.2; // HACK
             #end
+            cam = Scene.active.camera;
             camRigZ = Scene.active.getEmpty('CameraRigZ');
             camRigX = Scene.active.getEmpty('CameraRigX');
             mouse = Input.getMouse();
@@ -84,6 +87,9 @@ class Game extends iron.Trait {
             body.setLinearVelocity(0,0,0);
         }
 
+        cam.transform.loc.y = ZOOM_DEFAULT;
+        camRigX.transform.rot.set(0,0,0,1);
+        camRigX.transform.buildMatrix();
         camRigZ.transform.rot.set(0,0,0,1);
         camRigZ.transform.rotate( Vec4.zAxis(), Math.PI/4 );
         camRigZ.transform.buildMatrix();
@@ -165,11 +171,11 @@ class Game extends iron.Trait {
 
             if( mouse.wheelDelta != 0 ) {
                 if( mouse.wheelDelta < 0 ) {
-                    if( Scene.active.camera.transform.loc.y < ZOOM_MIN ) Scene.active.camera.transform.loc.y += ZOOM_SPEED;
+                    if( cam.transform.loc.y < ZOOM_MIN ) cam.transform.loc.y += ZOOM_SPEED;
                 } else {
-                    if( Scene.active.camera.transform.loc.y > ZOOM_MAX ) Scene.active.camera.transform.loc.y -= ZOOM_SPEED;
+                    if( cam.transform.loc.y > ZOOM_MAX ) cam.transform.loc.y -= ZOOM_SPEED;
                 }
-                Scene.active.camera.transform.buildMatrix();
+                cam.transform.buildMatrix();
             }
         }
 
