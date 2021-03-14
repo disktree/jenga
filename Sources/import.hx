@@ -10,6 +10,7 @@ import iron.math.Quat;
 import iron.math.RayCaster;
 import iron.math.Vec4;
 import iron.object.CameraObject;
+import iron.object.MeshObject;
 import iron.object.Object;
 import iron.system.Input;
 import iron.system.Time;

@@ -8,8 +8,12 @@ class BlockDrag extends Trait {
     static var v = new Vec4();
 	static var m = Mat4.identity();
 	static var first = true;
+
+	public static dynamic function onDragStart( obj : Object ) {}
+	public static dynamic function onDragEnd( obj : Object ) {}
 	
     public var pickedBody(default,null) : RigidBody = null;
+	public var body(default,null) : RigidBody;
 
 	var pickConstraint : bullet.Bt.Generic6DofConstraint = null;
 	var pickDist : Float;
@@ -19,6 +23,10 @@ class BlockDrag extends Trait {
 
 	public function new() {
 		super();
+		/* notifyOnInit(() -> {
+			//trace( object.getTrait(RigidBody));
+			body = object.getTrait(RigidBody);
+		}); */
 		if (first) {
 			first = false;
 			notifyOnUpdate(update);
@@ -71,14 +79,18 @@ class BlockDrag extends Trait {
 				pickDist = v.set(hit.x - rayFrom.x(), hit.y - rayFrom.y(), hit.z - rayFrom.z()).length();
 
 				Input.occupied = true;
+
+				onDragStart( pickedBody.object );
 			}
 		}
 
 		else if (mouse.released()) {
 			if (pickConstraint != null) {
+				var obj = pickedBody.object;
 				physics.world.removeConstraint(pickConstraint);
 				pickConstraint = null;
 				pickedBody = null;
+				onDragEnd( obj);
 			}
 			Input.occupied = false;
 		}
