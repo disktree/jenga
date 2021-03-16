@@ -16,7 +16,6 @@ class LoadingScreen {
 		g.fillRect( 0, 0, sw, sh );
 		g.color = 0xffffffff;
 		g.fillRect( cx - hw, cy - hw, BAR_W / assetsTotal * assetsLoaded, BAR_H );
-		g.color = 0xffffffff;
 	}
 
 }
