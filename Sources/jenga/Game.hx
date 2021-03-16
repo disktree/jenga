@@ -16,10 +16,11 @@ class Game extends iron.Trait {
     static inline var ROT_X_MIN = -0.3;
     static inline var ROT_X_MAX = 0.2;
 
+    public var blockDim(default,null)  : Vec4;
     public var blocks(default,null) : Array<Object>;
     public var blockDragged(default,null) : Object;
-    public var blockDim(default,null)  : Vec4;
 
+    var lastBlockDragged : Object;
     var cam : CameraObject;
     var camRigZ : Object;
     var camRigX : Object;
@@ -40,28 +41,24 @@ class Game extends iron.Trait {
             mouse = Input.getMouse();
             blocks = [];
             create({
-                numBlocks: 72,
+                numBlocks: 64,
                 blockObject : "Block3"
             }, start );
             notifyOnUpdate(update);
+            BlockDrag.onDragStart = b  -> {
+                trace("Block drag start: "+b.name);
+                blockDragged = b;
+                lastBlockDragged = null;
+            }
+            BlockDrag.onDragEnd = b  -> {
+                trace("Block drag end: "+b.name);
+                lastBlockDragged = blockDragged;
+                blockDragged = null;
+            }
         });
     }
 
-    public function clear() {
-        for( block in blocks ) {
-            // var drag = block.getTrait( BlockDrag );
-            // drag.remove();
-            // var rb = block.getTrait( RigidBody );
-            // rb.delete();
-            // //PhysicsWorld.active.removeRigidBody( rb );
-            block.remove();
-        }
-        // PhysicsWorld.active.reset();
-        blocks = [];
-    }
-
     public function create( config : Config, cb : Void->Void ) {
-        //clear();
         var blockName = config.blockObject;
         var container = Scene.active.getEmpty('BlockContainer');
         function spawnBlock() {
@@ -97,6 +94,7 @@ class Game extends iron.Trait {
         var numRows = Std.int(blocks.length / ROW_SIZE);
         var ranPosFactor = 0.005 + Math.random() * 0.01;
         var ranRotFactor = 0.02 + Math.random() * 0.04;
+        var zSpace = 0.01;
 
         var ix = 0;
         var px = 0.0;
@@ -125,28 +123,71 @@ class Game extends iron.Trait {
                 var body = b.getTrait( RigidBody );
                 body.syncTransform();
             }
-            pz += blockDim.z + 0.01;
+            pz += blockDim.z + zSpace;
             rz = !rz;
+        }
+
+        for( i in 0...ROW_SIZE ) {
+            blocks[Std.int(numRows * ROW_SIZE) - (i+1)].getTrait(BlockDrag).enabled = false;
         }
     }
 
     function update() {
-        if( blocks.length == 0 )
-            return;
-        blockDragged = null;
-        for( block in blocks ) {
-            var drag = block.getTrait(BlockDrag);
-            if( drag.pickedBody != null ) {
-                blockDragged = drag.pickedBody.object;
-                //trace(drag.pickedBody.object.name);
+
+        /*
+        // Detect physics contacts
+
+        if( blockDragged != null ) {
+            var body = blockDragged.getTrait(RigidBody);
+            var contacts = PhysicsWorld.active.getContactPairs( body );
+			if( contacts != null ) {
+				trace(contacts.length+' contacts');
+            }
+        } else if( lastBlockDragged != null ) {
+            var body = lastBlockDragged.getTrait(RigidBody);
+            var contacts = PhysicsWorld.active.getContactPairs( body );
+			if( contacts != null ) {
+				trace(contacts.length+' contacts');
+                for( contact in contacts ) {
+                    var rb = PhysicsWorld.active.rbMap.get( contact.a );
+                    if( rb == body ) rb = PhysicsWorld.active.rbMap.get( contact.b );
+                    //trace(rb.object.name.);
+                    if( rb.object.name == 'Ground' ) {
+                        trace("HIT FLOOR");
+                        var t = lastBlockDragged.getTrait( BlockDrag );
+                        trace(t!=null);
+                        lastBlockDragged.removeTrait(t);
+                        //lastBlockDragged.remove();
+                        lastBlockDragged = null;
+                        return;
+                    }
+                }
+
             }
         }
+        */
+
+        // Determine if blocks is below default z pos
+
+        /* var numRows = 16;
+        var pz = 0.0;
+        for( iz in 1...numRows ) {
+            pz = iz * blockDim.z;
+            for( ix in 0...ROW_SIZE ) {
+                var block = blocks[(iz*4)+(ix)];
+                if( block.transform.loc.z < pz ) {
+                    if( block != blockDragged )
+                        trace(block.name+' is dead');
+                }
+            }
+        } */
+       
+        // Camera controls
 
         var rotZ = 0.0;
         var rotX = 0.0;
-
         if( blockDragged != null ) {
-            //..
+           // trace(blockDragged.name);
         } else {
             if( mouse.down("right")) {
                 if( lastMouseX != 0 ) {
@@ -163,10 +204,8 @@ class Game extends iron.Trait {
                 }
                 lastMouseX = mouse.x;
                 lastMouseY = mouse.y;
-
             } else {
-                lastMouseX = 0;
-                lastMouseY = 0;
+                lastMouseX = lastMouseY = 0;
             }
 
             if( mouse.wheelDelta != 0 ) {
@@ -178,13 +217,12 @@ class Game extends iron.Trait {
                 cam.transform.buildMatrix();
             }
         }
-
         camRigZ.transform.rotate( new Vec4( 0,0,rotZ,1), 1 );
-        
         var rx = camRigX.transform.rot.x + rotX;
         if( rx > ROT_X_MAX ) rx = ROT_X_MAX;
         else if( rx < ROT_X_MIN ) rx = ROT_X_MIN;
         camRigX.transform.rot.x = rx;
         camRigX.transform.buildMatrix();
     }
+
 }
