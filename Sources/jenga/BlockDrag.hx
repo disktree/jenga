@@ -12,6 +12,7 @@ class BlockDrag extends Trait {
 	public static dynamic function onDragStart( obj : Object ) {}
 	public static dynamic function onDragEnd( obj : Object ) {}
 	
+	public var enabled = true;
     public var pickedBody(default,null) : RigidBody = null;
 	public var body(default,null) : RigidBody;
 
@@ -41,7 +42,8 @@ class BlockDrag extends Trait {
 		if (mouse.started()) {
 
 			var b = physics.pickClosest(mouse.x, mouse.y);
-			if (b != null && b.mass > 0 && !b.body.isKinematicObject() && b.object.getTrait(BlockDrag) != null) {
+			var drag = b.object.getTrait(BlockDrag);
+			if (b != null && b.mass > 0 && !b.body.isKinematicObject() && drag != null && drag.enabled) {
 
 				setRays();
 				pickedBody = b;
