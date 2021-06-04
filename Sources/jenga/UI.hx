@@ -27,7 +27,7 @@ class UI {
 		FILL_ACCENT_BG: false,
 		FILL_BUTTON_BG: false,
 		FILL_WINDOW_BG: false,
-		FONT_SIZE: 256,
+		FONT_SIZE: 128,
 		HIGHLIGHT_COL: 0xff205d9c,
 		LABEL_COL: 0xffffffff,
 		LINK_STYLE: Line,
@@ -39,6 +39,7 @@ class UI {
 		TEXT_OFFSET: 8,
 		WINDOW_BG_COL: 0x00000000,
 		WINDOW_TINT_COL: 0xffffffff,
+		FULL_TABS: true
 	};
     
 	public static var THEME_2 : TTheme = {
@@ -73,6 +74,7 @@ class UI {
 		TEXT_OFFSET: 8,
 		WINDOW_BG_COL: 0x00000000,
 		WINDOW_TINT_COL: 0xffffffff,
+		FULL_TABS: true
 	};
 
 	public static var fontTitle(default,null) : kha.Font;
