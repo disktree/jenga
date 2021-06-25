@@ -22,7 +22,7 @@ jobs:
       - name: Build
         uses: tong/armory_gh_actions@v0.0.19
         with:
-          blend: 'jenaga.blend'
+          blend: 'jenga.blend'
           targets: '["html5","krom","linux-hl"]'
             
       # - name: Deploy gh-pages
