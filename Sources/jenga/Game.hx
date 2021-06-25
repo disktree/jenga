@@ -24,9 +24,10 @@ class Game extends iron.Trait {
     var cam : CameraObject;
     var camRigZ : Object;
     var camRigX : Object;
-    var mouse : Mouse;
     var lastMouseX = 0.0;
     var lastMouseY = 0.0;
+    var mouse : Mouse;
+    var keyboard : Keyboard;
 
     public function new() {
         super();
@@ -39,11 +40,15 @@ class Game extends iron.Trait {
             camRigZ = Scene.active.getEmpty('CameraRigZ');
             camRigX = Scene.active.getEmpty('CameraRigX');
             mouse = Input.getMouse();
+            keyboard = Input.getKeyboard();
             blocks = [];
             create({
                 numBlocks: 64,
-                blockObject : "Block3"
-            }, start );
+                blockObject : "Block4"
+            }, () -> {
+                start();
+                resetCamera( 0.5 );
+            });
             notifyOnUpdate(update);
             BlockDrag.onDragStart = b  -> {
                 trace("Block drag start: "+b.name);
@@ -84,13 +89,6 @@ class Game extends iron.Trait {
             body.setLinearVelocity(0,0,0);
         }
 
-        cam.transform.loc.y = ZOOM_DEFAULT;
-        camRigX.transform.rot.set(0,0,0,1);
-        camRigX.transform.buildMatrix();
-        camRigZ.transform.rot.set(0,0,0,1);
-        camRigZ.transform.rotate( Vec4.zAxis(), Math.PI/4 );
-        camRigZ.transform.buildMatrix();
-
         var numRows = Std.int(blocks.length / ROW_SIZE);
         var ranPosFactor = 0.005 + Math.random() * 0.01;
         var ranRotFactor = 0.02 + Math.random() * 0.04;
@@ -130,6 +128,8 @@ class Game extends iron.Trait {
         for( i in 0...ROW_SIZE ) {
             blocks[Std.int(numRows * ROW_SIZE) - (i+1)].getTrait(BlockDrag).enabled = false;
         }
+
+        //resetCamera();
     }
 
     function update() {
@@ -184,6 +184,11 @@ class Game extends iron.Trait {
        
         // Camera controls
 
+        if( keyboard.started('0') ) {
+            resetCamera();
+            return;
+        }
+
         var rotZ = 0.0;
         var rotX = 0.0;
         if( blockDragged != null ) {
@@ -223,6 +228,63 @@ class Game extends iron.Trait {
         else if( rx < ROT_X_MIN ) rx = ROT_X_MIN;
         camRigX.transform.rot.x = rx;
         camRigX.transform.buildMatrix();
+    }
+
+    public function resetCamera( delay = 0.0 ) {
+
+        //trace("----"+camRigZ.transform.rot.z);
+
+        //TODO rotation tweens
+        
+        var t = {
+            zoom: cam.transform.loc.y,
+            //rx: 0.0, //camRigX.transform.rot.x,
+            //rz: camRigZ.transform.rot.z
+        };
+
+        Tween.to({
+            target: t,
+            props: {
+                zoom: ZOOM_DEFAULT,
+                //rx: Math.abs( camRigX.transform.rot.x ),
+                //rz: Math.abs( camRigX.transform.rot.z ) - Math.PI/4
+               //rx: 0.0,
+                //rz: camRigZ.transform.rot.z - Math.PI/4
+                //rz: 0.0 //Math.PI/4
+            },
+            duration: Math.abs( cam.transform.loc.y - ZOOM_DEFAULT ) * 0.1,
+            delay: delay,
+            ease: QuadInOut,
+            tick: () -> {
+                cam.transform.loc.y = t.zoom;
+                //cam.transform.buildMatrix();
+                //trace(t.rz);
+                //camRigZ.transform.rot.set( 0, 0, t.rz, 1 );
+                //camRigZ.transform.buildMatrix();
+               //camRigZ.transform.rotate( Vec4.zAxis(), rz );
+                //camRigX.transform.rot.fromAxisAngle( Vec4.xAxis(), t.rx);
+                // camRigZ.transform.rot.fromAxisAngle( Vec4.zAxis(), t.rz );
+                // camRigZ.transform.buildMatrix();
+                //camRigX.transform.rot.x = t.rx;
+                //camRigZ.transform.rot.z = t.rz;
+                //camRigX.transform.rotate( Vec4.zAxis(), t.rz );
+                //camRigZ.transform.rotate( Vec4.zAxis(), Math.PI/4 );
+                ///camRigX.transform.rotate( Vec4.xAxis(), camRigX.transform.rot.x - t.rx );
+                ///camRigZ.transform.rotate( Vec4.zAxis(), camRigZ.transform.rot.z - t.rz );
+                //camRigZ.transform.rotate( Vec4.zAxis(), camRigZ.transform.rot.z - t.rz );
+            }
+        });
+
+        camRigX.transform.rot.set(0,0,0,1);
+        camRigX.transform.buildMatrix();
+        
+        //cam.transform.loc.y = ZOOM_DEFAULT;
+        //cam.transform.buildMatrix();
+
+        camRigZ.transform.rot.set(0,0,0,1);
+        //camRigZ.transform.rot.z = Math.PI/4;
+        camRigZ.transform.rotate( Vec4.zAxis(), Math.PI/4 );
+        //camRigZ.transform.buildMatrix();
     }
 
 }

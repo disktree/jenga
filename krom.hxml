@@ -1,2 +1,2 @@
---cwd build_jenga
+--cwd build_jenga/debug/
 project-krom.hxml

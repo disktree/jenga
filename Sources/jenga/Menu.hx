@@ -23,7 +23,8 @@ class Menu extends iron.Trait {
                     target: this,
                     props: { opacity: 0.0 },
                     duration: 1.0,
-                    delay: 1.0
+                    delay: 1.0,
+                    //done: () -> removeRender2D( render2D )
                 });
             });
         });
@@ -33,6 +34,7 @@ class Menu extends iron.Trait {
         var kb = iron.system.Input.getKeyboard();
         if( kb.started( "escape" ) || kb.started( "space" ) || kb.started( "f5" ) ) {
             game.start();
+            game.resetCamera();
         }
     }
 
