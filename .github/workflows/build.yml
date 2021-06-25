@@ -1,0 +1,33 @@
+name: build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache armsdk
+        uses: actions/cache@v2
+        env:
+          armsdk-cache-version: 21.06
+        with:
+          path: ./armsdk
+          key: armsdk-cache-${{ env.armsdk-cache-version }}
+
+      - name: Build
+        uses: tong/armory_gh_actions@v0.0.19
+        with:
+          blend: 'jenaga.blend'
+          targets: '["html5","krom","linux-hl"]'
+            
+      # - name: Deploy gh-pages
+      #   run: mkdir -p build && mv */build_* build/
+      #   uses: JamesIves/github-pages-deploy-action@4.1.4
+      #   with:
+      #     branch: gh-pages
+      #     folder: .
