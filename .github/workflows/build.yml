@@ -20,7 +20,7 @@ jobs:
           key: armsdk-cache-${{ env.armsdk-cache-version }}
 
       - name: Build
-        uses: tong/armory_gh_actions@v0.0.20
+        uses: tong/armory_gh_actions@v0.0.22
         with:
           blend: 'jenga.blend'
           targets: '["html5","krom","linux-hl"]'
