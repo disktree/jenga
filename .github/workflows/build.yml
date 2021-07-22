@@ -19,7 +19,7 @@ jobs:
           path: ./armsdk
           key: armsdk-cache-${{ env.armsdk-cache-version }}
       - name: Build
-        uses: tong/armory_gh_actions@v0.33.0
+        uses: tong/armory_gh_actions@v0.34.0
         with:
           blend: jenga.blend
           exporter: html5
