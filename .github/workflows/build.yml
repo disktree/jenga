@@ -2,9 +2,9 @@ name: build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, dev ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, dev ]
 
 jobs:
   build:
@@ -19,7 +19,7 @@ jobs:
           path: ./armsdk
           key: armsdk-cache-${{ env.armsdk-cache-version }}
       - name: Build
-        uses: tong/armory_gh_actions@v0.0.33
+        uses: tong/armory_gh_actions@latest
         with:
           blend: jenga.blend
           exporter: html5
