@@ -14,17 +14,15 @@ jobs:
       - name: Cache armsdk
         uses: actions/cache@v2
         env:
-          armsdk-cache-version: 21.06
+          armsdk-cache-version: b0254a1
         with:
           path: ./armsdk
           key: armsdk-cache-${{ env.armsdk-cache-version }}
-
       - name: Build
-        uses: tong/armory_gh_actions@v0.0.22
+        uses: tong/armory_gh_actions@v0.0.33
         with:
-          blend: 'jenga.blend'
-          targets: '["html5","krom","linux-hl"]'
-            
+          blend: jenga.blend
+          exporter: html5
       # - name: Deploy gh-pages
       #   run: mkdir -p build && mv */build_* build/
       #   uses: JamesIves/github-pages-deploy-action@4.1.4
