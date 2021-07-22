@@ -23,9 +23,9 @@ jobs:
         with:
           blend: jenga.blend
           exporter: html5
-      # - name: Deploy gh-pages
-      #   run: mkdir -p build && mv */build_* build/
-      #   uses: JamesIves/github-pages-deploy-action@4.1.4
-      #   with:
-      #     branch: gh-pages
-      #     folder: .
+      - name: Deploy gh-pages
+        uses: JamesIves/github-pages-deploy-action@4.1.4
+        with:
+          branch: gh-pages
+          folder: build_jenga/html5
+          target-folder: .
