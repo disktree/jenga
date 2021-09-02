@@ -12,19 +12,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Cache armsdk
-        uses: actions/cache@v2
-        env:
-          armsdk-cache-version: ${{ env.armsdk_version }}
-        with:
-          path: _armsdk_
-          key: armsdk-cache-${{ env.armsdk-cache-version }}
+      # - name: Cache armsdk
+      #   uses: actions/cache@v2
+      #   env:
+      #     armsdk-cache-version: ${{ env.armsdk_version }}
+      #   with:
+      #     path: _armsdk_
+      #     key: armsdk-cache-${{ env.armsdk-cache-version }}
       - name: Build
         id: publish
-        uses: tong/armory_gh_actions@v0.1.5
+        uses: tong/armory_gh_actions@v0.1.6
         with:
-          blend: jenga.blend
           publish: web
+          blend: jenga.blend
           blender: latest/candidate
       - name: Result
         run: |
