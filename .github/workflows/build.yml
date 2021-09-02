@@ -21,7 +21,7 @@ jobs:
           key: armsdk-cache-${{ env.armsdk-cache-version }}
       - name: Build
         id: publish
-        uses: tong/armory_gh_actions@v0.1.3
+        uses: tong/armory_gh_actions@v0.1.5
         with:
           blend: jenga.blend
           publish: web
