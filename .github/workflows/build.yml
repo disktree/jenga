@@ -23,6 +23,7 @@ jobs:
         uses: tong/armory_gh_actions@v0.1.9
         with:
           publish: web
+          armsdk_ref: ${{ env.armsdk_version }}
           blend: jenga.blend
           blender: latest/stable
       - name: Result
