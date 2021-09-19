@@ -6,8 +6,6 @@ on:
 
 jobs:
   build:
-    env:
-      armsdk_version: 21.08
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -20,10 +18,9 @@ jobs:
       #     key: armsdk-cache-${{ env.armsdk-cache-version }}
       - name: Build
         id: publish
-        uses: tong/armory_gh_actions@v0.1.9
+        uses: tong/armory_gh_actions@v0.1.10
         with:
           publish: web
-          armsdk_ref: ${{ env.armsdk_version }}
           blend: jenga.blend
           blender: latest/stable
       - name: Result
