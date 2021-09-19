@@ -23,7 +23,9 @@ jobs:
           publish: web
           blend: jenga.blend
           blender: latest/stable
-      - name: Result
-        run: |
-          echo "Code: ${{ steps.publish.outputs.code }}"
-          echo "Time: ${{ steps.publish.outputs.time }}"
+      - name: Deploy gh-pages
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          branch: gh-pages
+          folder: build_jenga/html5
+          target-folder: web-desktop

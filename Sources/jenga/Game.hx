@@ -125,9 +125,9 @@ class Game extends iron.Trait {
             rz = !rz;
         }
 
-        for( i in 0...ROW_SIZE ) {
+        /* for( i in 0...ROW_SIZE ) {
             blocks[Std.int(numRows * ROW_SIZE) - (i+1)].getTrait(BlockDrag).enabled = false;
-        }
+        } */
 
         //resetCamera();
     }
