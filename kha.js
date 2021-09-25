@@ -93,7 +93,7 @@ Main.main = function() {
 	iron_object_BoneAnimation.skinMaxBones = 8;
 	iron_object_LightObject.cascadeCount = 4;
 	iron_object_LightObject.cascadeSplitFactor = 0.800000011920929;
-	armory_system_Starter.numAssets = 35;
+	armory_system_Starter.numAssets = 30;
 	armory_system_Starter.drawLoading = jenga_LoadingScreen.render;
 	armory_system_Starter.main("Game",0,true,true,false,720,1080,1,true,armory_renderpath_RenderPathCreator.get);
 };
@@ -1073,280 +1073,6 @@ iron_Trait.prototype = {
 	}
 	,__class__: iron_Trait
 };
-var iron_math_Vec4 = function(x,y,z,w) {
-	if(w == null) {
-		w = 1.0;
-	}
-	if(z == null) {
-		z = 0.0;
-	}
-	if(y == null) {
-		y = 0.0;
-	}
-	if(x == null) {
-		x = 0.0;
-	}
-	this.x = x;
-	this.y = y;
-	this.z = z;
-	this.w = w;
-};
-$hxClasses["iron.math.Vec4"] = iron_math_Vec4;
-iron_math_Vec4.__name__ = true;
-iron_math_Vec4.prototype = {
-	__class__: iron_math_Vec4
-};
-var kha_math_FastMatrix4 = function(_00,_10,_20,_30,_01,_11,_21,_31,_02,_12,_22,_32,_03,_13,_23,_33) {
-	this._00 = _00;
-	this._10 = _10;
-	this._20 = _20;
-	this._30 = _30;
-	this._01 = _01;
-	this._11 = _11;
-	this._21 = _21;
-	this._31 = _31;
-	this._02 = _02;
-	this._12 = _12;
-	this._22 = _22;
-	this._32 = _32;
-	this._03 = _03;
-	this._13 = _13;
-	this._23 = _23;
-	this._33 = _33;
-};
-$hxClasses["kha.math.FastMatrix4"] = kha_math_FastMatrix4;
-kha_math_FastMatrix4.__name__ = true;
-kha_math_FastMatrix4.prototype = {
-	__class__: kha_math_FastMatrix4
-};
-var iron_math_Mat4 = function(_00,_10,_20,_30,_01,_11,_21,_31,_02,_12,_22,_32,_03,_13,_23,_33) {
-	this.self = new kha_math_FastMatrix4(_00,_10,_20,_30,_01,_11,_21,_31,_02,_12,_22,_32,_03,_13,_23,_33);
-};
-$hxClasses["iron.math.Mat4"] = iron_math_Mat4;
-iron_math_Mat4.__name__ = true;
-iron_math_Mat4.prototype = {
-	__class__: iron_math_Mat4
-};
-var armory_trait_PhysicsDrag = function() {
-	this.pickedBody = null;
-	this.pickConstraint = null;
-	this.angularUpperLimit = new iron_math_Vec3(10,10,10);
-	this.angularLowerLimit = new iron_math_Vec3(-10,-10,-10);
-	this.linearUpperLimit = new iron_math_Vec3(0,0,0);
-	this.linearLowerLimit = new iron_math_Vec3(0,0,0);
-	iron_Trait.call(this);
-	if(armory_trait_PhysicsDrag.first) {
-		armory_trait_PhysicsDrag.first = false;
-		this.notifyOnUpdate($bind(this,this.update));
-	}
-};
-$hxClasses["armory.trait.PhysicsDrag"] = armory_trait_PhysicsDrag;
-armory_trait_PhysicsDrag.__name__ = true;
-armory_trait_PhysicsDrag.__super__ = iron_Trait;
-armory_trait_PhysicsDrag.prototype = $extend(iron_Trait.prototype,{
-	update: function() {
-		var physics = armory_trait_physics_bullet_PhysicsWorld.active;
-		if(this.pickedBody != null) {
-			this.pickedBody.activate();
-		}
-		var mouse = iron_system_Input.getMouse();
-		if(mouse.started()) {
-			var b = physics.pickClosest(mouse.x,mouse.y);
-			if(b != null && b.mass > 0 && !b.body.isKinematicObject() && b.object.getTrait(armory_trait_PhysicsDrag) != null) {
-				var mouse1 = iron_system_Input.getMouse();
-				var camera = iron_Scene.active.camera;
-				var _this = camera.transform.world;
-				var x = _this.self._30;
-				var y = _this.self._31;
-				var z = _this.self._32;
-				var w = _this.self._33;
-				if(w == null) {
-					w = 1.0;
-				}
-				if(z == null) {
-					z = 0.0;
-				}
-				if(y == null) {
-					y = 0.0;
-				}
-				if(x == null) {
-					x = 0.0;
-				}
-				this.rayFrom = new Ammo.btVector3(x,y,z);
-				iron_math_RayCaster.getDirection(armory_trait_PhysicsDrag.start,armory_trait_PhysicsDrag.end,mouse1.x,mouse1.y,camera);
-				this.rayTo = new Ammo.btVector3(armory_trait_PhysicsDrag.end.x,armory_trait_PhysicsDrag.end.y,armory_trait_PhysicsDrag.end.z);
-				this.pickedBody = b;
-				var _this = armory_trait_PhysicsDrag.m;
-				var m = b.object.transform.world;
-				var a00 = m.self._00;
-				var a01 = m.self._01;
-				var a02 = m.self._02;
-				var a03 = m.self._03;
-				var a10 = m.self._10;
-				var a11 = m.self._11;
-				var a12 = m.self._12;
-				var a13 = m.self._13;
-				var a20 = m.self._20;
-				var a21 = m.self._21;
-				var a22 = m.self._22;
-				var a23 = m.self._23;
-				var a30 = m.self._30;
-				var a31 = m.self._31;
-				var a32 = m.self._32;
-				var a33 = m.self._33;
-				var b00 = a00 * a11 - a01 * a10;
-				var b01 = a00 * a12 - a02 * a10;
-				var b02 = a00 * a13 - a03 * a10;
-				var b03 = a01 * a12 - a02 * a11;
-				var b04 = a01 * a13 - a03 * a11;
-				var b05 = a02 * a13 - a03 * a12;
-				var b06 = a20 * a31 - a21 * a30;
-				var b07 = a20 * a32 - a22 * a30;
-				var b08 = a20 * a33 - a23 * a30;
-				var b09 = a21 * a32 - a22 * a31;
-				var b10 = a21 * a33 - a23 * a31;
-				var b11 = a22 * a33 - a23 * a32;
-				var det = b00 * b11 - b01 * b10 + b02 * b09 + b03 * b08 - b04 * b07 + b05 * b06;
-				if(det == 0.0) {
-					_this.self._00 = 1.0;
-					_this.self._01 = 0.0;
-					_this.self._02 = 0.0;
-					_this.self._03 = 0.0;
-					_this.self._10 = 0.0;
-					_this.self._11 = 1.0;
-					_this.self._12 = 0.0;
-					_this.self._13 = 0.0;
-					_this.self._20 = 0.0;
-					_this.self._21 = 0.0;
-					_this.self._22 = 1.0;
-					_this.self._23 = 0.0;
-					_this.self._30 = 0.0;
-					_this.self._31 = 0.0;
-					_this.self._32 = 0.0;
-					_this.self._33 = 1.0;
-				} else {
-					det = 1.0 / det;
-					_this.self._00 = (a11 * b11 - a12 * b10 + a13 * b09) * det;
-					_this.self._01 = (a02 * b10 - a01 * b11 - a03 * b09) * det;
-					_this.self._02 = (a31 * b05 - a32 * b04 + a33 * b03) * det;
-					_this.self._03 = (a22 * b04 - a21 * b05 - a23 * b03) * det;
-					_this.self._10 = (a12 * b08 - a10 * b11 - a13 * b07) * det;
-					_this.self._11 = (a00 * b11 - a02 * b08 + a03 * b07) * det;
-					_this.self._12 = (a32 * b02 - a30 * b05 - a33 * b01) * det;
-					_this.self._13 = (a20 * b05 - a22 * b02 + a23 * b01) * det;
-					_this.self._20 = (a10 * b10 - a11 * b08 + a13 * b06) * det;
-					_this.self._21 = (a01 * b08 - a00 * b10 - a03 * b06) * det;
-					_this.self._22 = (a30 * b04 - a31 * b02 + a33 * b00) * det;
-					_this.self._23 = (a21 * b02 - a20 * b04 - a23 * b00) * det;
-					_this.self._30 = (a11 * b07 - a10 * b09 - a12 * b06) * det;
-					_this.self._31 = (a00 * b09 - a01 * b07 + a02 * b06) * det;
-					_this.self._32 = (a31 * b01 - a30 * b03 - a32 * b00) * det;
-					_this.self._33 = (a20 * b03 - a21 * b01 + a22 * b00) * det;
-				}
-				var hit = physics.hitPointWorld;
-				var _this = armory_trait_PhysicsDrag.v;
-				_this.x = hit.x;
-				_this.y = hit.y;
-				_this.z = hit.z;
-				_this.w = hit.w;
-				var _this = armory_trait_PhysicsDrag.v;
-				var m = armory_trait_PhysicsDrag.m;
-				var x = _this.x;
-				var y = _this.y;
-				var z = _this.z;
-				var w = _this.w;
-				_this.x = m.self._00 * x + m.self._10 * y + m.self._20 * z + m.self._30 * w;
-				_this.y = m.self._01 * x + m.self._11 * y + m.self._21 * z + m.self._31 * w;
-				_this.z = m.self._02 * x + m.self._12 * y + m.self._22 * z + m.self._32 * w;
-				_this.w = m.self._03 * x + m.self._13 * y + m.self._23 * z + m.self._33 * w;
-				var localPivot = new Ammo.btVector3(armory_trait_PhysicsDrag.v.x,armory_trait_PhysicsDrag.v.y,armory_trait_PhysicsDrag.v.z);
-				var tr = new Ammo.btTransform();
-				tr.setIdentity();
-				tr.setOrigin(localPivot);
-				this.pickConstraint = new Ammo.btGeneric6DofConstraint(b.body,tr,false);
-				this.pickConstraint.setLinearLowerLimit(new Ammo.btVector3(this.linearLowerLimit.x,this.linearLowerLimit.y,this.linearLowerLimit.z));
-				this.pickConstraint.setLinearUpperLimit(new Ammo.btVector3(this.linearUpperLimit.x,this.linearUpperLimit.y,this.linearUpperLimit.z));
-				this.pickConstraint.setAngularLowerLimit(new Ammo.btVector3(this.angularLowerLimit.x,this.angularLowerLimit.y,this.angularLowerLimit.z));
-				this.pickConstraint.setAngularUpperLimit(new Ammo.btVector3(this.angularUpperLimit.x,this.angularUpperLimit.y,this.angularUpperLimit.z));
-				physics.world.addConstraint(this.pickConstraint,false);
-				var _this = armory_trait_PhysicsDrag.v;
-				var x = hit.x - this.rayFrom.x();
-				var y = hit.y - this.rayFrom.y();
-				var z = hit.z - this.rayFrom.z();
-				_this.x = x;
-				_this.y = y;
-				_this.z = z;
-				_this.w = 1.0;
-				this.pickDist = Math.sqrt(_this.x * _this.x + _this.y * _this.y + _this.z * _this.z);
-				iron_system_Input.occupied = true;
-			}
-		} else if(mouse.released()) {
-			if(this.pickConstraint != null) {
-				physics.world.removeConstraint(this.pickConstraint);
-				this.pickConstraint = null;
-				this.pickedBody = null;
-			}
-			iron_system_Input.occupied = false;
-		} else if(mouse.down()) {
-			if(this.pickConstraint != null) {
-				var mouse = iron_system_Input.getMouse();
-				var camera = iron_Scene.active.camera;
-				var _this = camera.transform.world;
-				var x = _this.self._30;
-				var y = _this.self._31;
-				var z = _this.self._32;
-				var w = _this.self._33;
-				if(w == null) {
-					w = 1.0;
-				}
-				if(z == null) {
-					z = 0.0;
-				}
-				if(y == null) {
-					y = 0.0;
-				}
-				if(x == null) {
-					x = 0.0;
-				}
-				this.rayFrom = new Ammo.btVector3(x,y,z);
-				iron_math_RayCaster.getDirection(armory_trait_PhysicsDrag.start,armory_trait_PhysicsDrag.end,mouse.x,mouse.y,camera);
-				this.rayTo = new Ammo.btVector3(armory_trait_PhysicsDrag.end.x,armory_trait_PhysicsDrag.end.y,armory_trait_PhysicsDrag.end.z);
-				var dir = new Ammo.btVector3(this.rayTo.x() - this.rayFrom.x(),this.rayTo.y() - this.rayFrom.y(),this.rayTo.z() - this.rayFrom.z());
-				dir.normalize();
-				dir.setX(dir.x() * this.pickDist);
-				dir.setY(dir.y() * this.pickDist);
-				dir.setZ(dir.z() * this.pickDist);
-				var newPivotB = new Ammo.btVector3(this.rayFrom.x() + dir.x(),this.rayFrom.y() + dir.y(),this.rayFrom.z() + dir.z());
-				this.pickConstraint.getFrameOffsetA().setOrigin(newPivotB);
-			}
-		}
-	}
-	,setRays: function() {
-		var mouse = iron_system_Input.getMouse();
-		var camera = iron_Scene.active.camera;
-		var _this = camera.transform.world;
-		var x = _this.self._30;
-		var y = _this.self._31;
-		var z = _this.self._32;
-		var w = _this.self._33;
-		if(w == null) {
-			w = 1.0;
-		}
-		if(z == null) {
-			z = 0.0;
-		}
-		if(y == null) {
-			y = 0.0;
-		}
-		if(x == null) {
-			x = 0.0;
-		}
-		this.rayFrom = new Ammo.btVector3(x,y,z);
-		iron_math_RayCaster.getDirection(armory_trait_PhysicsDrag.start,armory_trait_PhysicsDrag.end,mouse.x,mouse.y,camera);
-		this.rayTo = new Ammo.btVector3(armory_trait_PhysicsDrag.end.x,armory_trait_PhysicsDrag.end.y,armory_trait_PhysicsDrag.end.z);
-	}
-	,__class__: armory_trait_PhysicsDrag
-});
 var armory_trait_internal_UniformsManager = function() {
 	this.uniformExists = false;
 	iron_Trait.call(this);
@@ -2636,6 +2362,60 @@ armory_trait_physics_bullet_PhysicsWorld.prototype = $extend(iron_Trait.prototyp
 	}
 	,__class__: armory_trait_physics_bullet_PhysicsWorld
 });
+var kha_math_FastMatrix4 = function(_00,_10,_20,_30,_01,_11,_21,_31,_02,_12,_22,_32,_03,_13,_23,_33) {
+	this._00 = _00;
+	this._10 = _10;
+	this._20 = _20;
+	this._30 = _30;
+	this._01 = _01;
+	this._11 = _11;
+	this._21 = _21;
+	this._31 = _31;
+	this._02 = _02;
+	this._12 = _12;
+	this._22 = _22;
+	this._32 = _32;
+	this._03 = _03;
+	this._13 = _13;
+	this._23 = _23;
+	this._33 = _33;
+};
+$hxClasses["kha.math.FastMatrix4"] = kha_math_FastMatrix4;
+kha_math_FastMatrix4.__name__ = true;
+kha_math_FastMatrix4.prototype = {
+	__class__: kha_math_FastMatrix4
+};
+var iron_math_Vec4 = function(x,y,z,w) {
+	if(w == null) {
+		w = 1.0;
+	}
+	if(z == null) {
+		z = 0.0;
+	}
+	if(y == null) {
+		y = 0.0;
+	}
+	if(x == null) {
+		x = 0.0;
+	}
+	this.x = x;
+	this.y = y;
+	this.z = z;
+	this.w = w;
+};
+$hxClasses["iron.math.Vec4"] = iron_math_Vec4;
+iron_math_Vec4.__name__ = true;
+iron_math_Vec4.prototype = {
+	__class__: iron_math_Vec4
+};
+var iron_math_Mat4 = function(_00,_10,_20,_30,_01,_11,_21,_31,_02,_12,_22,_32,_03,_13,_23,_33) {
+	this.self = new kha_math_FastMatrix4(_00,_10,_20,_30,_01,_11,_21,_31,_02,_12,_22,_32,_03,_13,_23,_33);
+};
+$hxClasses["iron.math.Mat4"] = iron_math_Mat4;
+iron_math_Mat4.__name__ = true;
+iron_math_Mat4.prototype = {
+	__class__: iron_math_Mat4
+};
 var iron_math_Quat = function(x,y,z,w) {
 	if(w == null) {
 		w = 1.0;
@@ -17853,9 +17633,11 @@ iron_system_Tween.easeElasticInOut = function(k) {
 	return a * Math.pow(2,-10 * --k) * Math.sin((k - 0.1) * (2 * Math.PI) / 0.4) * 0.5 + 1;
 };
 var jenga_BlockDrag = function() {
-	this.pickConstraint = null;
-	this.pickedBody = null;
 	this.enabled = true;
+	this.angularUpperLimit = new iron_math_Vec3(10,10,10);
+	this.angularLowerLimit = new iron_math_Vec3(-10,-10,-10);
+	this.linearUpperLimit = new iron_math_Vec3(0,0,0);
+	this.linearLowerLimit = new iron_math_Vec3(0,0,0);
 	iron_Trait.call(this);
 	if(jenga_BlockDrag.first) {
 		jenga_BlockDrag.first = false;
@@ -17993,8 +17775,8 @@ jenga_BlockDrag.prototype = $extend(iron_Trait.prototype,{
 				this.pickConstraint = new Ammo.btGeneric6DofConstraint(b.body,tr,false);
 				this.pickConstraint.setLinearLowerLimit(new Ammo.btVector3(0,0,0));
 				this.pickConstraint.setLinearUpperLimit(new Ammo.btVector3(0,0,0));
-				this.pickConstraint.setAngularLowerLimit(new Ammo.btVector3(-10,-10,-10));
-				this.pickConstraint.setAngularUpperLimit(new Ammo.btVector3(10,10,10));
+				this.pickConstraint.setAngularLowerLimit(new Ammo.btVector3(-5,-5,-5));
+				this.pickConstraint.setAngularUpperLimit(new Ammo.btVector3(5,5,5));
 				physics.world.addConstraint(this.pickConstraint,false);
 				var _this = jenga_BlockDrag.v;
 				var x = hit.x - this.rayFrom.x();
@@ -18050,6 +17832,30 @@ jenga_BlockDrag.prototype = $extend(iron_Trait.prototype,{
 				this.pickConstraint.getFrameOffsetA().setOrigin(newPivotB);
 			}
 		}
+	}
+	,setRays: function() {
+		var mouse = iron_system_Input.getMouse();
+		var camera = iron_Scene.active.camera;
+		var _this = camera.transform.world;
+		var x = _this.self._30;
+		var y = _this.self._31;
+		var z = _this.self._32;
+		var w = _this.self._33;
+		if(w == null) {
+			w = 1.0;
+		}
+		if(z == null) {
+			z = 0.0;
+		}
+		if(y == null) {
+			y = 0.0;
+		}
+		if(x == null) {
+			x = 0.0;
+		}
+		this.rayFrom = new Ammo.btVector3(x,y,z);
+		iron_math_RayCaster.getDirection(jenga_BlockDrag.start,jenga_BlockDrag.end,mouse.x,mouse.y,camera);
+		this.rayTo = new Ammo.btVector3(jenga_BlockDrag.end.x,jenga_BlockDrag.end.y,jenga_BlockDrag.end.z);
 	}
 	,__class__: jenga_BlockDrag
 });
@@ -37993,14 +37799,6 @@ armory_renderpath_NishitaData.mieScale = 1.2e3;
 armory_renderpath_NishitaData.ozoneCoeff = new iron_math_Vec3(1.59051840791988e-6,0.00000096707041180970,0.00000007309568762914);
 armory_renderpath_RenderPathCreator.setTargetMeshes = armory_renderpath_RenderPathDeferred.setTargetMeshes;
 armory_renderpath_RenderPathCreator.drawMeshes = armory_renderpath_RenderPathDeferred.drawMeshes;
-iron_math_Mat4.helpVec = new iron_math_Vec4();
-iron_math_Mat4.helpMat = new iron_math_Mat4(1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0);
-armory_trait_PhysicsDrag.__meta__ = { fields : { linearLowerLimit : { prop : null}, linearUpperLimit : { prop : null}, angularLowerLimit : { prop : null}, angularUpperLimit : { prop : null}}};
-armory_trait_PhysicsDrag.v = new iron_math_Vec4();
-armory_trait_PhysicsDrag.m = new iron_math_Mat4(1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0);
-armory_trait_PhysicsDrag.first = true;
-armory_trait_PhysicsDrag.start = new iron_math_Vec4();
-armory_trait_PhysicsDrag.end = new iron_math_Vec4();
 armory_trait_internal_UniformsManager.floatsRegistered = false;
 armory_trait_internal_UniformsManager.floatsMap = new haxe_ds_ObjectMap();
 armory_trait_internal_UniformsManager.vectorsRegistered = false;
@@ -38012,6 +37810,8 @@ armory_trait_physics_bullet_PhysicsConstraint.nextId = 0;
 armory_trait_physics_bullet_PhysicsConstraint.nullvec = true;
 armory_trait_physics_bullet_PhysicsWorld.sceneRemoved = false;
 armory_trait_physics_bullet_PhysicsWorld.nullvec = true;
+iron_math_Mat4.helpVec = new iron_math_Vec4();
+iron_math_Mat4.helpMat = new iron_math_Mat4(1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0);
 iron_math_Quat.helpMat = new iron_math_Mat4(1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0);
 armory_trait_physics_bullet_RigidBody.nextId = 0;
 armory_trait_physics_bullet_RigidBody.ammoArray = -1;
@@ -38132,6 +37932,7 @@ iron_system_Time.realDelta = 0.0;
 iron_system_Tween.eases = [iron_system_Tween.easeLinear,iron_system_Tween.easeSineIn,iron_system_Tween.easeSineOut,iron_system_Tween.easeSineInOut,iron_system_Tween.easeQuadIn,iron_system_Tween.easeQuadOut,iron_system_Tween.easeQuadInOut,iron_system_Tween.easeCubicIn,iron_system_Tween.easeCubicOut,iron_system_Tween.easeCubicInOut,iron_system_Tween.easeQuartIn,iron_system_Tween.easeQuartOut,iron_system_Tween.easeQuartInOut,iron_system_Tween.easeQuintIn,iron_system_Tween.easeQuintOut,iron_system_Tween.easeQuintInOut,iron_system_Tween.easeExpoIn,iron_system_Tween.easeExpoOut,iron_system_Tween.easeExpoInOut,iron_system_Tween.easeCircIn,iron_system_Tween.easeCircOut,iron_system_Tween.easeCircInOut,iron_system_Tween.easeBackIn,iron_system_Tween.easeBackOut,iron_system_Tween.easeBackInOut,iron_system_Tween.easeBounceIn,iron_system_Tween.easeBounceOut,iron_system_Tween.easeBounceInOut,iron_system_Tween.easeElasticIn,iron_system_Tween.easeElasticOut,iron_system_Tween.easeElasticInOut];
 iron_system_Tween.anims = [];
 iron_system_Tween.registered = false;
+jenga_BlockDrag.__meta__ = { fields : { linearLowerLimit : { prop : null}, linearUpperLimit : { prop : null}, angularLowerLimit : { prop : null}, angularUpperLimit : { prop : null}}};
 jenga_BlockDrag.start = new iron_math_Vec4();
 jenga_BlockDrag.end = new iron_math_Vec4();
 jenga_BlockDrag.v = new iron_math_Vec4();
@@ -38151,9 +37952,9 @@ kha_Scheduler.DIF_COUNT = 3;
 kha_Scheduler.maxframetime = 0.5;
 kha_Scheduler.startTime = 0;
 kha_Shaders.Block_wood23_mesh_fragData0 = "s2962:I3ZlcnNpb24gMzAwIGVzCnByZWNpc2lvbiBtZWRpdW1wIGZsb2F0OwpwcmVjaXNpb24gaGlnaHAgaW50OwoKdW5pZm9ybSBoaWdocCBzYW1wbGVyMkQgSW1hZ2VUZXh0dXJlXzAwMjsKdW5pZm9ybSBoaWdocCBzYW1wbGVyMkQgSW1hZ2VUZXh0dXJlOwp1bmlmb3JtIGhpZ2hwIHNhbXBsZXIyRCBJbWFnZVRleHR1cmVfMDAxOwoKaW4gaGlnaHAgdmVjMyB3bm9ybWFsOwppbiBoaWdocCB2ZWMyIHRleENvb3JkOwppbiBoaWdocCBtYXQzIFRCTjsKb3V0IGhpZ2hwIHZlYzQgZnJhZ0NvbG9yWzJdOwoKaGlnaHAgdmVjMiBvY3RhaGVkcm9uV3JhcChoaWdocCB2ZWMyIHYpCnsKICAgIHJldHVybiAodmVjMigxLjApIC0gYWJzKHYueXgpKSAqIHZlYzIoKHYueCA%PSAwLjApID8gMS4wIDogKC0xLjApLCAodi55ID49IDAuMCkgPyAxLjAgOiAoLTEuMCkpOwp9CgpoaWdocCBmbG9hdCBwYWNrRmxvYXRJbnQxNihoaWdocCBmbG9hdCBmLCB1aW50IGkpCnsKICAgIHJldHVybiAoMC4wNjI0ODU2OTQ4ODUyNTM5MDYyNSAqIGYpICsgKDAuMDYyNTAwOTUzNjc0MzE2NDA2MjUgKiBmbG9hdChpKSk7Cn0KCmhpZ2hwIGZsb2F0IHBhY2tGbG9hdDIoaGlnaHAgZmxvYXQgZjEsIGhpZ2hwIGZsb2F0IGYyKQp7CiAgICByZXR1cm4gZmxvb3IoZjEgKiAyNTUuMCkgKyBtaW4oZjIsIDAuOTkwMDAwMDA5NTM2NzQzMTY0MDYyNSk7Cn0KCnZvaWQgbWFpbigpCnsKICAgIGhpZ2hwIHZlYzMgbiA9IG5vcm1hbGl6ZSh3bm9ybWFsKTsKICAgIGhpZ2hwIHZlYzQgSW1hZ2VUZXh0dXJlXzAwMl90ZXhyZWFkX3N0b3JlID0gdGV4dHVyZShJbWFnZVRleHR1cmVfMDAyLCB0ZXhDb29yZCk7CiAgICBoaWdocCB2ZWM0IEltYWdlVGV4dHVyZV90ZXhyZWFkX3N0b3JlID0gdGV4dHVyZShJbWFnZVRleHR1cmUsIHRleENvb3JkKTsKICAgIGhpZ2hwIHZlYzMgXzg3ID0gcG93KEltYWdlVGV4dHVyZV90ZXhyZWFkX3N0b3JlLnh5eiwgdmVjMygyLjIwMDAwMDA0NzY4MzcxNTgyMDMxMjUpKTsKICAgIEltYWdlVGV4dHVyZV90ZXhyZWFkX3N0b3JlID0gdmVjNChfODcueCwgXzg3LnksIF84Ny56LCBJbWFnZVRleHR1cmVfdGV4cmVhZF9zdG9yZS53KTsKICAgIGhpZ2hwIHZlYzQgSW1hZ2VUZXh0dXJlXzAwMV90ZXhyZWFkX3N0b3JlID0gdGV4dHVyZShJbWFnZVRleHR1cmVfMDAxLCB0ZXhDb29yZCk7CiAgICBoaWdocCB2ZWMzIEltYWdlVGV4dHVyZV8wMDJfQ29sb3JfcmVzID0gSW1hZ2VUZXh0dXJlXzAwMl90ZXhyZWFkX3N0b3JlLnh5ejsKICAgIG4gPSAoSW1hZ2VUZXh0dXJlXzAwMl9Db2xvcl9yZXMgKiAyLjApIC0gdmVjMygxLjApOwogICAgbiA9IG5vcm1hbGl6ZShUQk4gKiBuKTsKICAgIGhpZ2hwIHZlYzMgSW1hZ2VUZXh0dXJlX0NvbG9yX3JlcyA9IEltYWdlVGV4dHVyZV90ZXhyZWFkX3N0b3JlLnh5ejsKICAgIGhpZ2hwIHZlYzMgSW1hZ2VUZXh0dXJlXzAwMV9Db2xvcl9yZXMgPSBJbWFnZVRleHR1cmVfMDAxX3RleHJlYWRfc3RvcmUueHl6OwogICAgaGlnaHAgdmVjMyBiYXNlY29sID0gSW1hZ2VUZXh0dXJlX0NvbG9yX3JlczsKICAgIGhpZ2hwIGZsb2F0IHJvdWdobmVzcyA9ICgoKChJbWFnZVRleHR1cmVfMDAxX0NvbG9yX3Jlcy54ICogMC4zMDAwMDAwMTE5MjA5Mjg5NTUwNzgxMjUpICsgKEltYWdlVGV4dHVyZV8wMDFfQ29sb3JfcmVzLnkgKiAwLjU4OTk5OTk3Mzc3Mzk1NjI5ODgyODEyNSkpICsgKEltYWdlVGV4dHVyZV8wMDFfQ29sb3JfcmVzLnogKiAwLjEwOTk5OTk5OTQwMzk1MzU1MjI0NjA5Mzc1KSkgLyAzLjApICogMi41OwogICAgaGlnaHAgZmxvYXQgbWV0YWxsaWMgPSAwLjA7CiAgICBoaWdocCBmbG9hdCBvY2NsdXNpb24gPSAxLjA7CiAgICBoaWdocCBmbG9hdCBzcGVjdWxhciA9IDEuMDsKICAgIG4gLz0gdmVjMygoYWJzKG4ueCkgKyBhYnMobi55KSkgKyBhYnMobi56KSk7CiAgICBoaWdocCB2ZWMyIF8xNjA7CiAgICBpZiAobi56ID49IDAuMCkKICAgIHsKICAgICAgICBfMTYwID0gbi54eTsKICAgIH0KICAgIGVsc2UKICAgIHsKICAgICAgICBfMTYwID0gb2N0YWhlZHJvbldyYXAobi54eSk7CiAgICB9CiAgICBuID0gdmVjMyhfMTYwLngsIF8xNjAueSwgbi56KTsKICAgIGZyYWdDb2xvclswXSA9IHZlYzQobi54eSwgcm91Z2huZXNzLCBwYWNrRmxvYXRJbnQxNihtZXRhbGxpYywgMHUpKTsKICAgIGZyYWdDb2xvclsxXSA9IHZlYzQoYmFzZWNvbCwgcGFja0Zsb2F0MihvY2NsdXNpb24sIHNwZWN1bGFyKSk7Cn0KCg";
-kha_Shaders.Block_wood23_mesh_vertData0 = "s1779:I3ZlcnNpb24gMzAwIGVzCgp1bmlmb3JtIG1hdDMgTjsKdW5pZm9ybSBmbG9hdCB0ZXhVbnBhY2s7CnVuaWZvcm0gbWF0NCBXVlA7CgppbiB2ZWM0IHBvczsKb3V0IHZlYzMgd25vcm1hbDsKaW4gdmVjMiBub3I7Cm91dCB2ZWMyIHRleENvb3JkOwppbiB2ZWMyIHRleDsKaW4gdmVjNCB0YW5nOwpvdXQgbWF0MyBUQk47CmluIHZlYzMgaXJvdDsKaW4gdmVjMyBpc2NsOwppbiB2ZWMzIGlwb3M7Cgp2b2lkIG1haW4oKQp7CiAgICB2ZWM0IHNwb3MgPSB2ZWM0KHBvcy54eXosIDEuMCk7CiAgICB3bm9ybWFsID0gbm9ybWFsaXplKE4gKiB2ZWMzKG5vciwgcG9zLncpKTsKICAgIHRleENvb3JkID0gdGV4ICogdGV4VW5wYWNrOwogICAgdmVjMyB0YW5nZW50ID0gbm9ybWFsaXplKE4gKiB0YW5nLnh5eik7CiAgICB2ZWMzIGJpdGFuZ2VudCA9IG5vcm1hbGl6ZShjcm9zcyh3bm9ybWFsLCB0YW5nZW50KSk7CiAgICBUQk4gPSBtYXQzKHZlYzModGFuZ2VudCksIHZlYzMoYml0YW5nZW50KSwgdmVjMyh3bm9ybWFsKSk7CiAgICBmbG9hdCBzcm90eCA9IHNpbihpcm90LngpOwogICAgZmxvYXQgY3JvdHggPSBjb3MoaXJvdC54KTsKICAgIGZsb2F0IHNyb3R5ID0gc2luKGlyb3QueSk7CiAgICBmbG9hdCBjcm90eSA9IGNvcyhpcm90LnkpOwogICAgZmxvYXQgc3JvdHogPSBzaW4oaXJvdC56KTsKICAgIGZsb2F0IGNyb3R6ID0gY29zKGlyb3Queik7CiAgICBtYXQzIG1pcm90ID0gbWF0Myh2ZWMzKGNyb3R5ICogY3JvdHosIHNyb3R6LCAoLXNyb3R5KSAqIGNyb3R6KSwgdmVjMygoKCgtY3JvdHkpICogc3JvdHopICogY3JvdHgpICsgKHNyb3R5ICogc3JvdHgpLCBjcm90eiAqIGNyb3R4LCAoKHNyb3R5ICogc3JvdHopICogY3JvdHgpICsgKGNyb3R5ICogc3JvdHgpKSwgdmVjMygoKGNyb3R5ICogc3JvdHopICogc3JvdHgpICsgKHNyb3R5ICogY3JvdHgpLCAoLWNyb3R6KSAqIHNyb3R4LCAoKCgtc3JvdHkpICogc3JvdHopICogc3JvdHgpICsgKGNyb3R5ICogY3JvdHgpKSk7CiAgICB2ZWMzIF8xNzIgPSBtaXJvdCAqIHNwb3MueHl6OwogICAgc3BvcyA9IHZlYzQoXzE3Mi54LCBfMTcyLnksIF8xNzIueiwgc3Bvcy53KTsKICAgIHdub3JtYWwgPSB0cmFuc3Bvc2UoaW52ZXJzZShtaXJvdCkpICogd25vcm1hbDsKICAgIHZlYzMgXzE4NCA9IHNwb3MueHl6ICogaXNjbDsKICAgIHNwb3MgPSB2ZWM0KF8xODQueCwgXzE4NC55LCBfMTg0LnosIHNwb3Mudyk7CiAgICB2ZWMzIF8xOTEgPSBzcG9zLnh5eiArIGlwb3M7CiAgICBzcG9zID0gdmVjNChfMTkxLngsIF8xOTEueSwgXzE5MS56LCBzcG9zLncpOwogICAgZ2xfUG9zaXRpb24gPSBXVlAgKiBzcG9zOwp9Cgo";
+kha_Shaders.Block_wood23_mesh_vertData0 = "s1651:I3ZlcnNpb24gMzAwIGVzCgp1bmlmb3JtIG1hdDMgTjsKdW5pZm9ybSBmbG9hdCB0ZXhVbnBhY2s7CnVuaWZvcm0gbWF0NCBXVlA7CgppbiB2ZWM0IHBvczsKb3V0IHZlYzMgd25vcm1hbDsKaW4gdmVjMiBub3I7Cm91dCB2ZWMyIHRleENvb3JkOwppbiB2ZWMyIHRleDsKaW4gdmVjNCB0YW5nOwpvdXQgbWF0MyBUQk47CmluIHZlYzMgaXJvdDsKaW4gdmVjMyBpcG9zOwoKdm9pZCBtYWluKCkKewogICAgdmVjNCBzcG9zID0gdmVjNChwb3MueHl6LCAxLjApOwogICAgd25vcm1hbCA9IG5vcm1hbGl6ZShOICogdmVjMyhub3IsIHBvcy53KSk7CiAgICB0ZXhDb29yZCA9IHRleCAqIHRleFVucGFjazsKICAgIHZlYzMgdGFuZ2VudCA9IG5vcm1hbGl6ZShOICogdGFuZy54eXopOwogICAgdmVjMyBiaXRhbmdlbnQgPSBub3JtYWxpemUoY3Jvc3Mod25vcm1hbCwgdGFuZ2VudCkpOwogICAgVEJOID0gbWF0Myh2ZWMzKHRhbmdlbnQpLCB2ZWMzKGJpdGFuZ2VudCksIHZlYzMod25vcm1hbCkpOwogICAgZmxvYXQgc3JvdHggPSBzaW4oaXJvdC54KTsKICAgIGZsb2F0IGNyb3R4ID0gY29zKGlyb3QueCk7CiAgICBmbG9hdCBzcm90eSA9IHNpbihpcm90LnkpOwogICAgZmxvYXQgY3JvdHkgPSBjb3MoaXJvdC55KTsKICAgIGZsb2F0IHNyb3R6ID0gc2luKGlyb3Queik7CiAgICBmbG9hdCBjcm90eiA9IGNvcyhpcm90LnopOwogICAgbWF0MyBtaXJvdCA9IG1hdDModmVjMyhjcm90eSAqIGNyb3R6LCBzcm90eiwgKC1zcm90eSkgKiBjcm90eiksIHZlYzMoKCgoLWNyb3R5KSAqIHNyb3R6KSAqIGNyb3R4KSArIChzcm90eSAqIHNyb3R4KSwgY3JvdHogKiBjcm90eCwgKChzcm90eSAqIHNyb3R6KSAqIGNyb3R4KSArIChjcm90eSAqIHNyb3R4KSksIHZlYzMoKChjcm90eSAqIHNyb3R6KSAqIHNyb3R4KSArIChzcm90eSAqIGNyb3R4KSwgKC1jcm90eikgKiBzcm90eCwgKCgoLXNyb3R5KSAqIHNyb3R6KSAqIHNyb3R4KSArIChjcm90eSAqIGNyb3R4KSkpOwogICAgdmVjMyBfMTcyID0gbWlyb3QgKiBzcG9zLnh5ejsKICAgIHNwb3MgPSB2ZWM0KF8xNzIueCwgXzE3Mi55LCBfMTcyLnosIHNwb3Mudyk7CiAgICB3bm9ybWFsID0gdHJhbnNwb3NlKGludmVyc2UobWlyb3QpKSAqIHdub3JtYWw7CiAgICB2ZWMzIF8xODQgPSBzcG9zLnh5eiArIGlwb3M7CiAgICBzcG9zID0gdmVjNChfMTg0LngsIF8xODQueSwgXzE4NC56LCBzcG9zLncpOwogICAgZ2xfUG9zaXRpb24gPSBXVlAgKiBzcG9zOwp9Cgo";
 kha_Shaders.Block_wood23_shadowmap_fragData0 = "s107:I3ZlcnNpb24gMzAwIGVzCnByZWNpc2lvbiBtZWRpdW1wIGZsb2F0OwpwcmVjaXNpb24gaGlnaHAgaW50OwoKdm9pZCBtYWluKCkKewp9Cgo";
-kha_Shaders.Block_wood23_shadowmap_vertData0 = "s1214:I3ZlcnNpb24gMzAwIGVzCgp1bmlmb3JtIG1hdDQgTFdWUDsKCmluIHZlYzQgcG9zOwppbiB2ZWMzIGlyb3Q7CmluIHZlYzMgaXNjbDsKaW4gdmVjMyBpcG9zOwoKdm9pZCBtYWluKCkKewogICAgdmVjNCBzcG9zID0gdmVjNChwb3MueHl6LCAxLjApOwogICAgZmxvYXQgc3JvdHggPSBzaW4oaXJvdC54KTsKICAgIGZsb2F0IGNyb3R4ID0gY29zKGlyb3QueCk7CiAgICBmbG9hdCBzcm90eSA9IHNpbihpcm90LnkpOwogICAgZmxvYXQgY3JvdHkgPSBjb3MoaXJvdC55KTsKICAgIGZsb2F0IHNyb3R6ID0gc2luKGlyb3Queik7CiAgICBmbG9hdCBjcm90eiA9IGNvcyhpcm90LnopOwogICAgbWF0MyBtaXJvdCA9IG1hdDModmVjMyhjcm90eSAqIGNyb3R6LCBzcm90eiwgKC1zcm90eSkgKiBjcm90eiksIHZlYzMoKCgoLWNyb3R5KSAqIHNyb3R6KSAqIGNyb3R4KSArIChzcm90eSAqIHNyb3R4KSwgY3JvdHogKiBjcm90eCwgKChzcm90eSAqIHNyb3R6KSAqIGNyb3R4KSArIChjcm90eSAqIHNyb3R4KSksIHZlYzMoKChjcm90eSAqIHNyb3R6KSAqIHNyb3R4KSArIChzcm90eSAqIGNyb3R4KSwgKC1jcm90eikgKiBzcm90eCwgKCgoLXNyb3R5KSAqIHNyb3R6KSAqIHNyb3R4KSArIChjcm90eSAqIGNyb3R4KSkpOwogICAgdmVjMyBfMTE2ID0gbWlyb3QgKiBzcG9zLnh5ejsKICAgIHNwb3MgPSB2ZWM0KF8xMTYueCwgXzExNi55LCBfMTE2LnosIHNwb3Mudyk7CiAgICB2ZWMzIF8xMjMgPSBzcG9zLnh5eiAqIGlzY2w7CiAgICBzcG9zID0gdmVjNChfMTIzLngsIF8xMjMueSwgXzEyMy56LCBzcG9zLncpOwogICAgdmVjMyBfMTMwID0gc3Bvcy54eXogKyBpcG9zOwogICAgc3BvcyA9IHZlYzQoXzEzMC54LCBfMTMwLnksIF8xMzAueiwgc3Bvcy53KTsKICAgIGdsX1Bvc2l0aW9uID0gTFdWUCAqIHNwb3M7Cn0KCg";
+kha_Shaders.Block_wood23_shadowmap_vertData0 = "s1086:I3ZlcnNpb24gMzAwIGVzCgp1bmlmb3JtIG1hdDQgTFdWUDsKCmluIHZlYzQgcG9zOwppbiB2ZWMzIGlyb3Q7CmluIHZlYzMgaXBvczsKCnZvaWQgbWFpbigpCnsKICAgIHZlYzQgc3BvcyA9IHZlYzQocG9zLnh5eiwgMS4wKTsKICAgIGZsb2F0IHNyb3R4ID0gc2luKGlyb3QueCk7CiAgICBmbG9hdCBjcm90eCA9IGNvcyhpcm90LngpOwogICAgZmxvYXQgc3JvdHkgPSBzaW4oaXJvdC55KTsKICAgIGZsb2F0IGNyb3R5ID0gY29zKGlyb3QueSk7CiAgICBmbG9hdCBzcm90eiA9IHNpbihpcm90LnopOwogICAgZmxvYXQgY3JvdHogPSBjb3MoaXJvdC56KTsKICAgIG1hdDMgbWlyb3QgPSBtYXQzKHZlYzMoY3JvdHkgKiBjcm90eiwgc3JvdHosICgtc3JvdHkpICogY3JvdHopLCB2ZWMzKCgoKC1jcm90eSkgKiBzcm90eikgKiBjcm90eCkgKyAoc3JvdHkgKiBzcm90eCksIGNyb3R6ICogY3JvdHgsICgoc3JvdHkgKiBzcm90eikgKiBjcm90eCkgKyAoY3JvdHkgKiBzcm90eCkpLCB2ZWMzKCgoY3JvdHkgKiBzcm90eikgKiBzcm90eCkgKyAoc3JvdHkgKiBjcm90eCksICgtY3JvdHopICogc3JvdHgsICgoKC1zcm90eSkgKiBzcm90eikgKiBzcm90eCkgKyAoY3JvdHkgKiBjcm90eCkpKTsKICAgIHZlYzMgXzExNiA9IG1pcm90ICogc3Bvcy54eXo7CiAgICBzcG9zID0gdmVjNChfMTE2LngsIF8xMTYueSwgXzExNi56LCBzcG9zLncpOwogICAgdmVjMyBfMTIzID0gc3Bvcy54eXogKyBpcG9zOwogICAgc3BvcyA9IHZlYzQoXzEyMy54LCBfMTIzLnksIF8xMjMueiwgc3Bvcy53KTsKICAgIGdsX1Bvc2l0aW9uID0gTFdWUCAqIHNwb3M7Cn0KCg";
 kha_Shaders.Gridbox_mesh_fragData0 = "s3766:I3ZlcnNpb24gMzAwIGVzCnByZWNpc2lvbiBtZWRpdW1wIGZsb2F0OwpwcmVjaXNpb24gaGlnaHAgaW50OwoKdW5pZm9ybSBoaWdocCBzYW1wbGVyMkQgSW1hZ2VUZXh0dXJlOwoKaW4gaGlnaHAgdmVjMyB3bm9ybWFsOwppbiBoaWdocCB2ZWMyIHRleENvb3JkOwpvdXQgaGlnaHAgdmVjNCBmcmFnQ29sb3JbMl07CgpoaWdocCB2ZWMzIHRleF9jaGVja2VyKGhpZ2hwIHZlYzMgY28sIGhpZ2hwIHZlYzMgY29sMSwgaGlnaHAgdmVjMyBjb2wyLCBoaWdocCBmbG9hdCBzY2FsZSkKewogICAgaGlnaHAgdmVjMyBwID0gKGNvICsgdmVjMyg5Ljk5OTk4OTc0MjkzNzAzMjEzMzM0MDgzNTU3MTI4OTFlLTA3KSkgKiBzY2FsZTsKICAgIGhpZ2hwIGZsb2F0IHhpID0gYWJzKGZsb29yKHAueCkpOwogICAgaGlnaHAgZmxvYXQgeWkgPSBhYnMoZmxvb3IocC55KSk7CiAgICBoaWdocCBmbG9hdCB6aSA9IGFicyhmbG9vcihwLnopKTsKICAgIGJvb2wgY2hlY2sgPSAobW9kKHhpLCAyLjApID09IG1vZCh5aSwgMi4wKSkgPT0gKG1vZCh6aSwgMi4wKSAhPSAwLjApOwogICAgYnZlYzMgXzEwNCA9IGJ2ZWMzKGNoZWNrKTsKICAgIHJldHVybiB2ZWMzKF8xMDQueCA:IGNvbDEueCA6IGNvbDIueCwgXzEwNC55ID8gY29sMS55IDogY29sMi55LCBfMTA0LnogPyBjb2wxLnogOiBjb2wyLnopOwp9CgpoaWdocCB2ZWMyIG9jdGFoZWRyb25XcmFwKGhpZ2hwIHZlYzIgdikKewogICAgcmV0dXJuICh2ZWMyKDEuMCkgLSBhYnModi55eCkpICogdmVjMigodi54ID49IDAuMCkgPyAxLjAgOiAoLTEuMCksICh2LnkgPj0gMC4wKSA:IDEuMCA6ICgtMS4wKSk7Cn0KCmhpZ2hwIGZsb2F0IHBhY2tGbG9hdEludDE2KGhpZ2hwIGZsb2F0IGYsIHVpbnQgaSkKewogICAgcmV0dXJuICgwLjA2MjQ4NTY5NDg4NTI1MzkwNjI1ICogZikgKyAoMC4wNjI1MDA5NTM2NzQzMTY0MDYyNSAqIGZsb2F0KGkpKTsKfQoKaGlnaHAgZmxvYXQgcGFja0Zsb2F0MihoaWdocCBmbG9hdCBmMSwgaGlnaHAgZmxvYXQgZjIpCnsKICAgIHJldHVybiBmbG9vcihmMSAqIDI1NS4wKSArIG1pbihmMiwgMC45OTAwMDAwMDk1MzY3NDMxNjQwNjI1KTsKfQoKdm9pZCBtYWluKCkKewogICAgaGlnaHAgdmVjMyBuID0gbm9ybWFsaXplKHdub3JtYWwpOwogICAgaGlnaHAgdmVjMyBUZXh0dXJlQ29vcmRpbmF0ZV90ZXhyZWFkX1VWX3JlcyA9IHZlYzModGV4Q29vcmQueCwgMS4wIC0gdGV4Q29vcmQueSwgMC4wKTsKICAgIGhpZ2hwIHZlYzMgTWFwcGluZ190ZXhyZWFkX1ZlY3Rvcl9yZXMgPSBUZXh0dXJlQ29vcmRpbmF0ZV90ZXhyZWFkX1VWX3JlcyAqIHZlYzMoOC4wKTsKICAgIGhpZ2hwIHZlYzQgSW1hZ2VUZXh0dXJlX3RleHJlYWRfc3RvcmUgPSB0ZXh0dXJlKEltYWdlVGV4dHVyZSwgdmVjMihNYXBwaW5nX3RleHJlYWRfVmVjdG9yX3Jlcy54LCAxLjAgLSBNYXBwaW5nX3RleHJlYWRfVmVjdG9yX3Jlcy55KSk7CiAgICBoaWdocCB2ZWMzIF8xNDcgPSBwb3coSW1hZ2VUZXh0dXJlX3RleHJlYWRfc3RvcmUueHl6LCB2ZWMzKDIuMjAwMDAwMDQ3NjgzNzE1ODIwMzEyNSkpOwogICAgSW1hZ2VUZXh0dXJlX3RleHJlYWRfc3RvcmUgPSB2ZWM0KF8xNDcueCwgXzE0Ny55LCBfMTQ3LnosIEltYWdlVGV4dHVyZV90ZXhyZWFkX3N0b3JlLncpOwogICAgaGlnaHAgdmVjMyBJbWFnZVRleHR1cmVfQ29sb3JfcmVzID0gSW1hZ2VUZXh0dXJlX3RleHJlYWRfc3RvcmUueHl6OwogICAgaGlnaHAgdmVjMyBUZXh0dXJlQ29vcmRpbmF0ZV9VVl9yZXMgPSB2ZWMzKHRleENvb3JkLngsIDEuMCAtIHRleENvb3JkLnksIDAuMCk7CiAgICBoaWdocCB2ZWMzIE1hcHBpbmdfVmVjdG9yX3JlcyA9IFRleHR1cmVDb29yZGluYXRlX1VWX3JlcyAqIHZlYzMoOC4wKTsKICAgIGhpZ2hwIHZlYzMgQ2hlY2tlclRleHR1cmVfQ29sb3JfcmVzID0gdGV4X2NoZWNrZXIoTWFwcGluZ19WZWN0b3JfcmVzLCB2ZWMzKDAuNjExMDEyMjc5OTg3MzM1MjA1MDc4MTI1KSwgdmVjMygwLjEzODE2NjMyMzMwNDE3NjMzMDU2NjQwNjI1KSwgMi4wKTsKICAgIGhpZ2hwIGZsb2F0IE1hdGhfVmFsdWVfcmVzID0gKCgoKChDaGVja2VyVGV4dHVyZV9Db2xvcl9yZXMueCAqIDAuMzAwMDAwMDExOTIwOTI4OTU1MDc4MTI1KSArIChDaGVja2VyVGV4dHVyZV9Db2xvcl9yZXMueSAqIDAuNTg5OTk5OTczNzczOTU2Mjk4ODI4MTI1KSkgKyAoQ2hlY2tlclRleHR1cmVfQ29sb3JfcmVzLnogKiAwLjEwOTk5OTk5OTQwMzk1MzU1MjI0NjA5Mzc1KSkgLyAzLjApICogMi41KSAqIDUuMDsKICAgIGhpZ2hwIHZlYzMgYmFzZWNvbCA9IEltYWdlVGV4dHVyZV9Db2xvcl9yZXM7CiAgICBoaWdocCBmbG9hdCByb3VnaG5lc3MgPSBNYXRoX1ZhbHVlX3JlczsKICAgIGhpZ2hwIGZsb2F0IG1ldGFsbGljID0gMC4xMDAwMDAwMDE0OTAxMTYxMTkzODQ3NjU2MjU7CiAgICBoaWdocCBmbG9hdCBvY2NsdXNpb24gPSAwLjU7CiAgICBoaWdocCBmbG9hdCBzcGVjdWxhciA9IDEuMDsKICAgIG4gLz0gdmVjMygoYWJzKG4ueCkgKyBhYnMobi55KSkgKyBhYnMobi56KSk7CiAgICBoaWdocCB2ZWMyIF8yMTg7CiAgICBpZiAobi56ID49IDAuMCkKICAgIHsKICAgICAgICBfMjE4ID0gbi54eTsKICAgIH0KICAgIGVsc2UKICAgIHsKICAgICAgICBfMjE4ID0gb2N0YWhlZHJvbldyYXAobi54eSk7CiAgICB9CiAgICBuID0gdmVjMyhfMjE4LngsIF8yMTgueSwgbi56KTsKICAgIGZyYWdDb2xvclswXSA9IHZlYzQobi54eSwgcm91Z2huZXNzLCBwYWNrRmxvYXRJbnQxNihtZXRhbGxpYywgMHUpKTsKICAgIGZyYWdDb2xvclsxXSA9IHZlYzQoYmFzZWNvbCwgcGFja0Zsb2F0MihvY2NsdXNpb24sIHNwZWN1bGFyKSk7Cn0KCg";
 kha_Shaders.Gridbox_mesh_vertData0 = "s422:I3ZlcnNpb24gMzAwIGVzCgp1bmlmb3JtIG1hdDMgTjsKdW5pZm9ybSBmbG9hdCB0ZXhVbnBhY2s7CnVuaWZvcm0gbWF0NCBXVlA7CgppbiB2ZWM0IHBvczsKb3V0IHZlYzMgd25vcm1hbDsKaW4gdmVjMiBub3I7Cm91dCB2ZWMyIHRleENvb3JkOwppbiB2ZWMyIHRleDsKCnZvaWQgbWFpbigpCnsKICAgIHZlYzQgc3BvcyA9IHZlYzQocG9zLnh5eiwgMS4wKTsKICAgIHdub3JtYWwgPSBub3JtYWxpemUoTiAqIHZlYzMobm9yLCBwb3MudykpOwogICAgdGV4Q29vcmQgPSB0ZXggKiB0ZXhVbnBhY2s7CiAgICBnbF9Qb3NpdGlvbiA9IFdWUCAqIHNwb3M7Cn0KCg";
 kha_Shaders.World_World_fragData0 = "s999:I3ZlcnNpb24gMzAwIGVzCnByZWNpc2lvbiBtZWRpdW1wIGZsb2F0OwpwcmVjaXNpb24gaGlnaHAgaW50OwoKdW5pZm9ybSBoaWdocCBzYW1wbGVyMkQgZW52bWFwOwp1bmlmb3JtIGhpZ2hwIGZsb2F0IGVudm1hcFN0cmVuZ3RoOwoKaW4gaGlnaHAgdmVjMyBub3JtYWw7Cm91dCBoaWdocCB2ZWM0IGZyYWdDb2xvcjsKCmhpZ2hwIHZlYzIgZW52TWFwRXF1aXJlY3QoaGlnaHAgdmVjMyBub3JtYWxfMSkKewogICAgaGlnaHAgZmxvYXQgcGhpID0gYWNvcyhub3JtYWxfMS56KTsKICAgIGhpZ2hwIGZsb2F0IHRoZXRhID0gYXRhbigtbm9ybWFsXzEueSwgbm9ybWFsXzEueCkgKyAzLjE0MTU5Mjc0MTAxMjU3MzI0MjE4NzU7CiAgICByZXR1cm4gdmVjMih0aGV0YSAvIDYuMjgzMTg1NDgyMDI1MTQ2NDg0Mzc1LCBwaGkgLyAzLjE0MTU5Mjc0MTAxMjU3MzI0MjE4NzUpOwp9Cgp2b2lkIG1haW4oKQp7CiAgICBoaWdocCB2ZWMzIG4gPSBub3JtYWxpemUobm9ybWFsKTsKICAgIGhpZ2hwIHZlYzMgRW52aXJvbm1lbnRUZXh0dXJlX0NvbG9yX3JlcyA9IHRleHR1cmUoZW52bWFwLCBlbnZNYXBFcXVpcmVjdChuKSkueHl6ICogZW52bWFwU3RyZW5ndGg7CiAgICBmcmFnQ29sb3IgPSB2ZWM0KEVudmlyb25tZW50VGV4dHVyZV9Db2xvcl9yZXMueCwgRW52aXJvbm1lbnRUZXh0dXJlX0NvbG9yX3Jlcy55LCBFbnZpcm9ubWVudFRleHR1cmVfQ29sb3JfcmVzLnosIGZyYWdDb2xvci53KTsKICAgIGZyYWdDb2xvci53ID0gMC4wOwp9Cgo";
