@@ -1,33 +1,43 @@
 package jenga;
 
-class BlockDrag extends Trait {
+import iron.Trait;
+import iron.system.Input;
+import iron.math.Vec3;
+import iron.math.Vec4;
+import iron.math.Mat4;
+import iron.math.RayCaster;
+import armory.trait.physics.RigidBody;
+import armory.trait.physics.PhysicsWorld;
 
-    static var start = new Vec4();
+class BlockDrag extends Trait {
+	
+	static var start = new Vec4();
 	static var end = new Vec4();
 
-    static var v = new Vec4();
+	static var v = new Vec4();
 	static var m = Mat4.identity();
 	static var first = true;
 
 	public static dynamic function onDragStart( obj : Object ) {}
 	public static dynamic function onDragEnd( obj : Object ) {}
-	
+
+	@prop public var linearLowerLimit = new Vec3(0,0,0);
+	@prop public var linearUpperLimit = new Vec3(0,0,0);
+	@prop public var angularLowerLimit = new Vec3(-10,-10,-10);
+	@prop public var angularUpperLimit = new Vec3(10,10,10);
+
 	public var enabled = true;
-    public var pickedBody(default,null) : RigidBody = null;
+	public var pickedBody(default,null) : RigidBody;
 	public var body(default,null) : RigidBody;
 
-	var pickConstraint : bullet.Bt.Generic6DofConstraint = null;
-	var pickDist : Float;
+	var pickConstraint: bullet.Bt.Generic6DofConstraint;
+	var pickDist: Float;
 
-	var rayFrom : bullet.Bt.Vector3;
-	var rayTo : bullet.Bt.Vector3;
+	var rayFrom: bullet.Bt.Vector3;
+	var rayTo: bullet.Bt.Vector3;
 
 	public function new() {
 		super();
-		/* notifyOnInit(() -> {
-			//trace( object.getTrait(RigidBody));
-			body = object.getTrait(RigidBody);
-		}); */
 		if (first) {
 			first = false;
 			notifyOnUpdate(update);
@@ -43,6 +53,7 @@ class BlockDrag extends Trait {
 
 			var b = physics.pickClosest(mouse.x, mouse.y);
 			var drag = b.object.getTrait(BlockDrag);
+			//if (b != null && b.mass > 0 && !b.body.isKinematicObject() && b.object.getTrait(PhysicsDrag) != null) {
 			if (b != null && b.mass > 0 && !b.body.isKinematicObject() && drag != null && drag.enabled) {
 
 				setRays();
@@ -58,10 +69,14 @@ class BlockDrag extends Trait {
 				tr.setOrigin(localPivot);
 
 				pickConstraint = new bullet.Bt.Generic6DofConstraint(b.body, tr, false);
-				pickConstraint.setLinearLowerLimit(new bullet.Bt.Vector3(0, 0, 0));
+				// pickConstraint.setLinearLowerLimit(new bullet.Bt.Vector3(linearLowerLimit.x, linearLowerLimit.y, linearLowerLimit.z));
+				// pickConstraint.setLinearUpperLimit(new bullet.Bt.Vector3(linearUpperLimit.x, linearUpperLimit.y, linearUpperLimit.z));
+				// pickConstraint.setAngularLowerLimit(new bullet.Bt.Vector3(angularLowerLimit.x, angularLowerLimit.y, angularLowerLimit.z));
+				// pickConstraint.setAngularUpperLimit(new bullet.Bt.Vector3(angularUpperLimit.x, angularUpperLimit.y, angularUpperLimit.z));
+				pickConstraint.setLinearLowerLimit(new bullet.Bt.Vector3(-0, -0, -0));
 				pickConstraint.setLinearUpperLimit(new bullet.Bt.Vector3(0, 0, 0));
-				pickConstraint.setAngularLowerLimit(new bullet.Bt.Vector3(-10, -10, -10));
-				pickConstraint.setAngularUpperLimit(new bullet.Bt.Vector3(10, 10, 10));
+				pickConstraint.setAngularLowerLimit(new bullet.Bt.Vector3(-5, -5, -5));
+				pickConstraint.setAngularUpperLimit(new bullet.Bt.Vector3(5, 5, 5));
 				physics.world.addConstraint(pickConstraint, false);
 
 				/*pickConstraint.setParam(4, 0.8, 0);
