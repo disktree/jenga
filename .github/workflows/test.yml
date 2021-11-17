@@ -20,11 +20,13 @@ jobs:
         id: krom
         uses: armory3d/armory_gh_actions@v0.1.10
         with:
-          build: linux-krom
+          build: krom-linux
           blend: jenga.blend
           blender: latest/stable
-      # - name: Deploy gh-pages
-      #   uses: JamesIves/github-pages-deploy-action@4.1.5
-      #   with:
-      #     branch: gh-pages
-      #     folder: build_jenga/html5
+      - name: Linux
+        id: linux
+        uses: armory3d/armory_gh_actions@v0.1.10
+        with:
+          build: linux-hl
+          blend: jenga.blend
+          blender: latest/stable

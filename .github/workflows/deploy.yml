@@ -21,7 +21,7 @@ jobs:
       - name: Buid krom-linux
         uses: armory3d/armory_gh_actions@v0.1.10
         with:
-          publish: web
+          publish: krom-linux
           blend: jenga.blend
       - name: Store krom-linux artifacts
         uses: actions/upload-artifact@v2
