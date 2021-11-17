@@ -1,6 +1,5 @@
-
 [JENGA!](http://disktree.net/app/games/jenga/)
 ======
-A fucking jenga game.
+Fucking jenga tower.
 
-[![build](https://github.com/disktree/jenga/actions/workflows/build.yml/badge.svg)](https://github.com/disktree/jenga/actions/workflows/build.yml)
+[![test](https://github.com/disktree/jenga/actions/workflows/test.yml/badge.svg)](https://github.com/disktree/jenga/actions/workflows/test.yml)
