@@ -17963,25 +17963,26 @@ var jenga_Game = function() {
 	iron_Trait.call(this);
 	haxe_Log.trace("JENGA " + "1.3.0",{ fileName : "jenga/Game.hx", lineNumber : 34, className : "jenga.Game", methodName : "new"});
 	this.notifyOnInit(function() {
-		iron_Scene.active.world.raw.probe.strength = 0.2;
+		haxe_Log.trace(iron_Scene.active.world.raw.probe.strength,{ fileName : "jenga/Game.hx", lineNumber : 36, className : "jenga.Game", methodName : "new"});
+		iron_Scene.active.world.raw.probe.strength = .5;
 		_gthis.cam = iron_Scene.active.camera;
 		_gthis.camRigZ = iron_Scene.active.getEmpty("CameraRigZ");
 		_gthis.camRigX = iron_Scene.active.getEmpty("CameraRigX");
 		_gthis.mouse = iron_system_Input.getMouse();
 		_gthis.keyboard = iron_system_Input.getKeyboard();
 		_gthis.blocks = [];
-		_gthis.create({ numBlocks : 64, blockObject : "Block4"},function() {
+		_gthis.create({ numBlocks : 64, blockObject : "Block"},function() {
 			_gthis.start();
 			_gthis.resetCamera(0.5);
 		});
 		_gthis.notifyOnUpdate($bind(_gthis,_gthis.update));
 		jenga_BlockDrag.onDragStart = function(b) {
-			haxe_Log.trace("Block drag start: " + b.name,{ fileName : "jenga/Game.hx", lineNumber : 54, className : "jenga.Game", methodName : "new"});
+			haxe_Log.trace("Block drag start: " + b.name,{ fileName : "jenga/Game.hx", lineNumber : 55, className : "jenga.Game", methodName : "new"});
 			_gthis.blockDragged = b;
 			_gthis.lastBlockDragged = null;
 		};
 		jenga_BlockDrag.onDragEnd = function(b) {
-			haxe_Log.trace("Block drag end: " + b.name,{ fileName : "jenga/Game.hx", lineNumber : 59, className : "jenga.Game", methodName : "new"});
+			haxe_Log.trace("Block drag end: " + b.name,{ fileName : "jenga/Game.hx", lineNumber : 60, className : "jenga.Game", methodName : "new"});
 			_gthis.lastBlockDragged = _gthis.blockDragged;
 			_gthis.blockDragged = null;
 		};
