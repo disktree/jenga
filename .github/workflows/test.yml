@@ -13,7 +13,7 @@ jobs:
         id: html5
         uses: armory3d/armory_gh_actions@v0.1.10
         with:
-          build: web
+          build: html5
           blend: jenga.blend
           blender: latest/stable
       - name: Krom

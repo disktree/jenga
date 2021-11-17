@@ -33,8 +33,9 @@ class Game extends iron.Trait {
         super();
         trace( 'JENGA ${Main.projectVersion}' );
         notifyOnInit( () -> {
+            trace(Scene.active.world.raw.probe.strength);
             #if kha_html5
-            Scene.active.world.raw.probe.strength = 0.2; // HACK
+            Scene.active.world.raw.probe.strength = .5; //0.2; // HACK
             #end
             cam = Scene.active.camera;
             camRigZ = Scene.active.getEmpty('CameraRigZ');
@@ -44,7 +45,7 @@ class Game extends iron.Trait {
             blocks = [];
             create({
                 numBlocks: 64,
-                blockObject : "Block4"
+                blockObject : "Block"
             }, () -> {
                 start();
                 resetCamera( 0.5 );
