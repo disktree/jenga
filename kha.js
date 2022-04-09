@@ -95,7 +95,7 @@ Main.main = function() {
 	iron_object_LightObject.cascadeSplitFactor = 0.800000011920929;
 	armory_system_Starter.numAssets = 30;
 	armory_system_Starter.drawLoading = jenga_LoadingScreen.render;
-	armory_system_Starter.main("Game",0,true,true,false,720,1080,1,true,armory_renderpath_RenderPathCreator.get);
+	armory_system_Starter.main("Game",0,true,true,false,1080,1080,1,true,armory_renderpath_RenderPathCreator.get);
 };
 Math.__name__ = true;
 var Reflect = function() { };
@@ -187,6 +187,13 @@ Std.parseInt = function(x) {
 	}
 	return null;
 };
+Std.random = function(x) {
+	if(x <= 0) {
+		return 0;
+	} else {
+		return Math.floor(Math.random() * x);
+	}
+};
 var StringTools = function() { };
 $hxClasses["StringTools"] = StringTools;
 StringTools.__name__ = true;
@@ -270,7 +277,12 @@ armory_object_Uniforms.register = function() {
 	iron_object_Uniforms.externalIntLinks = [];
 };
 armory_object_Uniforms.textureLink = function(object,mat,link) {
-	if(link == "_nishitaLUT") {
+	switch(link) {
+	case "_morphDataNor":
+		return (js_Boot.__cast(object , iron_object_MeshObject)).morphTarget.morphDataNor;
+	case "_morphDataPos":
+		return (js_Boot.__cast(object , iron_object_MeshObject)).morphTarget.morphDataPos;
+	case "_nishitaLUT":
 		if(armory_renderpath_Nishita.data == null) {
 			armory_renderpath_Nishita.recompute(iron_Scene.active.world);
 		}
@@ -1004,7 +1016,7 @@ armory_system_Starter.main = function(scene,mode,resize,min,max,w,h,msaa,vsync,g
 	(function(name) {
 		kha_Assets.loadBlobFromPath(name,function(b) {
 			(1,eval)(b.toString());
-			Ammo({print:function(s){haxe.Log.trace(s);}}).then(function(){ tasks--; start();});
+			Ammo({print:function(s){iron.log(s);}}).then(function(){ tasks--; start();});
 		},null,{ fileName : "Sources/armory/system/Starter.hx", lineNumber : 78, className : "armory.system.Starter", methodName : "main"});
 	})("ammo.js");
 	tasks -= 1;
@@ -2256,16 +2268,15 @@ armory_trait_physics_bullet_PhysicsWorld.prototype = $extend(iron_Trait.prototyp
 			var body11 = contactManifold.getBody1();
 			var body12 = body1.upcast(body11);
 			var numContacts = contactManifold.getNumContacts();
-			var pt = null;
-			var posA = null;
-			var posB = null;
-			var nor = null;
-			var cp = null;
 			var _g2 = 0;
 			var _g3 = numContacts;
 			while(_g2 < _g3) {
 				var j = _g2++;
-				pt = contactManifold.getContactPoint(j);
+				var pt = contactManifold.getContactPoint(j);
+				var posA = null;
+				var posB = null;
+				var nor = null;
+				var cp = null;
 				posA = pt.get_m_positionWorldOnA();
 				posB = pt.get_m_positionWorldOnB();
 				nor = pt.get_m_normalWorldOnB();
@@ -2761,7 +2772,7 @@ armory_trait_physics_bullet_RigidBody.prototype = $extend(iron_Trait.prototype,{
 		} else {
 			var trans = this.body.getWorldTransform();
 			var p = trans.getOrigin();
-			var qw = trans.getRotation();
+			var q = trans.getRotation();
 			var _this = this.transform.loc;
 			var x = p.x();
 			var y = p.y();
@@ -2771,10 +2782,10 @@ armory_trait_physics_bullet_RigidBody.prototype = $extend(iron_Trait.prototype,{
 			_this.z = z;
 			_this.w = 1.0;
 			var _this = this.transform.rot;
-			var x = qw.x();
-			var y = qw.y();
-			var z = qw.z();
-			var w = qw.w();
+			var x = q.x();
+			var y = q.y();
+			var z = q.z();
+			var w = q.w();
 			_this.x = x;
 			_this.y = y;
 			_this.z = z;
@@ -2812,6 +2823,9 @@ armory_trait_physics_bullet_RigidBody.prototype = $extend(iron_Trait.prototype,{
 		if(this.physics != null) {
 			this.physics.removeRigidBody(this);
 		}
+	}
+	,isActive: function() {
+		return this.body.isActive();
 	}
 	,activate: function() {
 		this.body.activate(false);
@@ -3617,138 +3631,6 @@ var haxe_io_Encoding = $hxEnums["haxe.io.Encoding"] = { __ename__:true,__constru
 	,RawNative: {_hx_name:"RawNative",_hx_index:1,__enum__:"haxe.io.Encoding",toString:$estr}
 };
 haxe_io_Encoding.__constructs__ = [haxe_io_Encoding.UTF8,haxe_io_Encoding.RawNative];
-var haxe_ds_ArraySort = function() { };
-$hxClasses["haxe.ds.ArraySort"] = haxe_ds_ArraySort;
-haxe_ds_ArraySort.__name__ = true;
-haxe_ds_ArraySort.sort = function(a,cmp) {
-	haxe_ds_ArraySort.rec(a,cmp,0,a.length);
-};
-haxe_ds_ArraySort.rec = function(a,cmp,from,to) {
-	var middle = from + to >> 1;
-	if(to - from < 12) {
-		if(to <= from) {
-			return;
-		}
-		var _g = from + 1;
-		while(_g < to) {
-			var j = _g++;
-			while(j > from) {
-				if(cmp(a[j],a[j - 1]) < 0) {
-					haxe_ds_ArraySort.swap(a,j - 1,j);
-				} else {
-					break;
-				}
-				--j;
-			}
-		}
-		return;
-	}
-	haxe_ds_ArraySort.rec(a,cmp,from,middle);
-	haxe_ds_ArraySort.rec(a,cmp,middle,to);
-	haxe_ds_ArraySort.doMerge(a,cmp,from,middle,to,middle - from,to - middle);
-};
-haxe_ds_ArraySort.doMerge = function(a,cmp,from,pivot,to,len1,len2) {
-	while(true) {
-		var first_cut;
-		var second_cut;
-		var len11;
-		var len22;
-		if(len1 == 0 || len2 == 0) {
-			return;
-		}
-		if(len1 + len2 == 2) {
-			if(cmp(a[pivot],a[from]) < 0) {
-				haxe_ds_ArraySort.swap(a,pivot,from);
-			}
-			return;
-		}
-		if(len1 > len2) {
-			len11 = len1 >> 1;
-			first_cut = from + len11;
-			second_cut = haxe_ds_ArraySort.lower(a,cmp,pivot,to,first_cut);
-			len22 = second_cut - pivot;
-		} else {
-			len22 = len2 >> 1;
-			second_cut = pivot + len22;
-			first_cut = haxe_ds_ArraySort.upper(a,cmp,from,pivot,second_cut);
-			len11 = first_cut - from;
-		}
-		haxe_ds_ArraySort.rotate(a,cmp,first_cut,pivot,second_cut);
-		var new_mid = first_cut + len22;
-		haxe_ds_ArraySort.doMerge(a,cmp,from,first_cut,new_mid,len11,len22);
-		from = new_mid;
-		pivot = second_cut;
-		len1 -= len11;
-		len2 -= len22;
-	}
-};
-haxe_ds_ArraySort.rotate = function(a,cmp,from,mid,to) {
-	if(from == mid || mid == to) {
-		return;
-	}
-	var n = haxe_ds_ArraySort.gcd(to - from,mid - from);
-	while(n-- != 0) {
-		var val = a[from + n];
-		var shift = mid - from;
-		var p1 = from + n;
-		var p2 = from + n + shift;
-		while(p2 != from + n) {
-			a[p1] = a[p2];
-			p1 = p2;
-			if(to - p2 > shift) {
-				p2 += shift;
-			} else {
-				p2 = from + (shift - (to - p2));
-			}
-		}
-		a[p1] = val;
-	}
-};
-haxe_ds_ArraySort.gcd = function(m,n) {
-	while(n != 0) {
-		var t = m % n;
-		m = n;
-		n = t;
-	}
-	return m;
-};
-haxe_ds_ArraySort.upper = function(a,cmp,from,to,val) {
-	var len = to - from;
-	var half;
-	var mid;
-	while(len > 0) {
-		half = len >> 1;
-		mid = from + half;
-		if(cmp(a[val],a[mid]) < 0) {
-			len = half;
-		} else {
-			from = mid + 1;
-			len = len - half - 1;
-		}
-	}
-	return from;
-};
-haxe_ds_ArraySort.lower = function(a,cmp,from,to,val) {
-	var len = to - from;
-	var half;
-	var mid;
-	while(len > 0) {
-		half = len >> 1;
-		mid = from + half;
-		if(cmp(a[mid],a[val]) < 0) {
-			from = mid + 1;
-			len = len - half - 1;
-		} else {
-			len = half;
-		}
-	}
-	return from;
-};
-haxe_ds_ArraySort.swap = function(a,i,j) {
-	var tmp = a[i];
-	a[i] = a[j];
-	a[j] = tmp;
-};
 var haxe_ds_IntMap = function() {
 	this.h = { };
 };
@@ -3765,7 +3647,7 @@ haxe_ds_IntMap.prototype = {
 	}
 	,keys: function() {
 		var a = [];
-		for( var key in this.h ) if(this.h.hasOwnProperty(key)) a.push(key | 0);
+		for( var key in this.h ) if(this.h.hasOwnProperty(key)) a.push(+key);
 		return new haxe_iterators_ArrayIterator(a);
 	}
 	,iterator: function() {
@@ -5072,12 +4954,12 @@ iron_Scene.create = function(format,done) {
 				haxe_Log.trace("No camera found for scene \"" + format.name + "\"",{ fileName : "Sources/iron/Scene.hx", lineNumber : 135, className : "iron.Scene", methodName : "create"});
 			}
 			iron_Scene.active.camera = iron_Scene.active.getCamera(format.camera_ref);
+			iron_Scene.active.sceneParent = sceneObject;
 			iron_Scene.active.ready = true;
 			var _g = 0;
 			var _g1 = iron_Scene.active.traitInits;
 			while(_g < _g1.length) _g1[_g++]();
 			iron_Scene.active.traitInits = [];
-			iron_Scene.active.sceneParent = sceneObject;
 			iron_Scene.active.initializing = false;
 			done(sceneObject);
 		});
@@ -5264,7 +5146,7 @@ iron_Scene.createTraits = function(traits,object) {
 			}
 			var traitInst = iron_Scene.createTraitClassInstance(t.class_name,args);
 			if(traitInst == null) {
-				haxe_Log.trace("Error: Trait '" + t.class_name + "' referenced in object '" + object.name + "' not found",{ fileName : "Sources/iron/Scene.hx", lineNumber : 859, className : "iron.Scene", methodName : "createTraits"});
+				haxe_Log.trace("Error: Trait '" + t.class_name + "' referenced in object '" + object.name + "' not found",{ fileName : "Sources/iron/Scene.hx", lineNumber : 863, className : "iron.Scene", methodName : "createTraits"});
 				continue;
 			}
 			if(t.props != null) {
@@ -5400,9 +5282,9 @@ iron_Scene.prototype = {
 	,addObject: function(parent) {
 		var object = new iron_object_Object();
 		if(parent != null) {
-			parent.addChild(object);
+			object.setParent(parent);
 		} else {
-			this.root.addChild(object);
+			object.setParent(this.root);
 		}
 		return object;
 	}
@@ -5443,36 +5325,36 @@ iron_Scene.prototype = {
 	,addMeshObject: function(data,materials,parent) {
 		var object = new iron_object_MeshObject(data,materials);
 		if(parent != null) {
-			parent.addChild(object);
+			object.setParent(parent);
 		} else {
-			this.root.addChild(object);
+			object.setParent(this.root);
 		}
 		return object;
 	}
 	,addLightObject: function(data,parent) {
 		var object = new iron_object_LightObject(data);
 		if(parent != null) {
-			parent.addChild(object);
+			object.setParent(parent);
 		} else {
-			this.root.addChild(object);
+			object.setParent(this.root);
 		}
 		return object;
 	}
 	,addCameraObject: function(data,parent) {
 		var object = new iron_object_CameraObject(data);
 		if(parent != null) {
-			parent.addChild(object);
+			object.setParent(parent);
 		} else {
-			this.root.addChild(object);
+			object.setParent(this.root);
 		}
 		return object;
 	}
 	,addSpeakerObject: function(data,parent) {
 		var object = new iron_object_SpeakerObject(data);
 		if(parent != null) {
-			parent.addChild(object);
+			object.setParent(parent);
 		} else {
-			this.root.addChild(object);
+			object.setParent(this.root);
 		}
 		return object;
 	}
@@ -5823,6 +5705,7 @@ iron_Scene.prototype = {
 			iron_Scene.createConstraints(o.constraints,object);
 			iron_Scene.generateTransform(o,object.transform);
 			object.setupAnimation(oactions);
+			object.setupMorphTargets();
 			if(o.properties != null) {
 				object.properties = new haxe_ds_StringMap();
 				var _g = 0;
@@ -6001,7 +5884,7 @@ iron_data_ConstData.createScreenAlignedData = function() {
 	iron_data_ConstData.screenAlignedVB = new kha_graphics4_VertexBuffer(data.length / (structure.byteSize() / 4 | 0) | 0,structure,0);
 	var vertices = iron_data_ConstData.screenAlignedVB.lock();
 	var _g = 0;
-	var _g1 = vertices.byteLength >> 2;
+	var _g1 = vertices.byteLength / 4 | 0;
 	while(_g < _g1) {
 		var i = _g++;
 		vertices.setFloat32(i * 4,data[i],true);
@@ -6027,7 +5910,7 @@ iron_data_ConstData.createSkydomeData = function() {
 	iron_data_ConstData.skydomeVB = new kha_graphics4_VertexBuffer(pos.length / 3 | 0,structure,0);
 	var vertices = iron_data_ConstData.skydomeVB.lock();
 	var _g = 0;
-	var _g1 = (vertices.byteLength >> 2) / structLength | 0;
+	var _g1 = vertices.byteLength / 4 / structLength | 0;
 	while(_g < _g1) {
 		var i = _g++;
 		vertices.setFloat32(i * structLength * 4,pos[i * 3],true);
@@ -6582,11 +6465,11 @@ iron_data_Geometry.getVertexStructure = function(vertexArrays) {
 iron_data_Geometry.getVertexData = function(data) {
 	switch(data) {
 	case "short2norm":
-		return 5;
+		return 23;
 	case "short4norm":
-		return 6;
+		return 27;
 	default:
-		return 6;
+		return 27;
 	}
 };
 iron_data_Geometry.buildVertices = function(vertices,vertexArrays,offset,fakeUVs,uvsIndex) {
@@ -6655,7 +6538,7 @@ iron_data_Geometry.prototype = {
 		this.instancedVB = new kha_graphics4_VertexBuffer(this.instanceCount,structure,usage,1);
 		var vertices = this.instancedVB.lock();
 		var _g = 0;
-		var _g1 = vertices.byteLength >> 2;
+		var _g1 = vertices.byteLength / 4 | 0;
 		while(_g < _g1) {
 			var i = _g++;
 			vertices.setFloat32(i * 4,data.getFloat32(i * 4,kha_arrays_ByteArray.LITTLE_ENDIAN),true);
@@ -6699,10 +6582,10 @@ iron_data_Geometry.prototype = {
 			vb.unlock();
 			this.vertexBufferMap.h[key] = vb;
 			if(atex && this.uvs == null) {
-				haxe_Log.trace("Armory Warning: Geometry " + this.name + " is missing UV map",{ fileName : "Sources/iron/data/Geometry.hx", lineNumber : 237, className : "iron.data.Geometry", methodName : "get"});
+				haxe_Log.trace("Armory Warning: Geometry " + this.name + " is missing UV map",{ fileName : "Sources/iron/data/Geometry.hx", lineNumber : 228, className : "iron.data.Geometry", methodName : "get"});
 			}
 			if(acol && this.cols == null) {
-				haxe_Log.trace("Armory Warning: Geometry " + this.name + " is missing vertex colors",{ fileName : "Sources/iron/data/Geometry.hx", lineNumber : 238, className : "iron.data.Geometry", methodName : "get"});
+				haxe_Log.trace("Armory Warning: Geometry " + this.name + " is missing vertex colors",{ fileName : "Sources/iron/data/Geometry.hx", lineNumber : 229, className : "iron.data.Geometry", methodName : "get"});
 			}
 		}
 		return vb;
@@ -7168,9 +7051,9 @@ iron_data_ShaderContext.parseData = function(data) {
 	} else if(data == "float4") {
 		return 3;
 	} else if(data == "short2norm") {
-		return 5;
+		return 23;
 	} else if(data == "short4norm") {
-		return 6;
+		return 27;
 	}
 	return 0;
 };
@@ -9826,17 +9709,31 @@ iron_object_Object.seededRandom = function() {
 	return iron_object_Object.seed / 233280.0;
 };
 iron_object_Object.prototype = {
-	addChild: function(o,parentInverse) {
+	setParent: function(parentObject,parentInverse,keepTransform) {
+		if(keepTransform == null) {
+			keepTransform = false;
+		}
 		if(parentInverse == null) {
 			parentInverse = false;
 		}
-		if(o.parent == this) {
+		if(parentObject == this || parentObject == this.parent) {
 			return;
 		}
-		this.children.push(o);
-		o.parent = this;
+		if(this.parent != null) {
+			HxOverrides.remove(this.parent.children,this);
+			if(keepTransform) {
+				this.transform.applyParent();
+			}
+			this.parent = null;
+			this.transform.buildMatrix();
+		}
+		if(parentObject == null) {
+			parentObject = iron_Scene.active.sceneParent;
+		}
+		this.parent = parentObject;
+		this.parent.children.push(this);
 		if(parentInverse) {
-			o.transform.applyParentInverse();
+			this.transform.applyParentInverse();
 		}
 	}
 	,remove: function() {
@@ -9968,6 +9865,8 @@ iron_object_Object.prototype = {
 			return;
 		}
 		this.animation = new iron_object_ObjectAnimation(this,oactions);
+	}
+	,setupMorphTargets: function() {
 	}
 	,__class__: iron_object_Object
 };
@@ -10681,113 +10580,6 @@ iron_object_LightObject.updateLightsArray = function() {
 		iron_object_LightObject.lightsArray.setFloat32((i * 12 + 11) * 4,0.0,true);
 		++i;
 	}
-};
-iron_object_LightObject.updateLWVPMatrixArray = function(object,type) {
-	if(iron_object_LightObject.LWVPMatrixArray == null) {
-		iron_object_LightObject.LWVPMatrixArray = kha_arrays_Float32Array._new(64);
-	}
-	var lights = iron_Scene.active.lights;
-	var n = lights.length > 4 ? 4 : lights.length;
-	var i = 0;
-	var _g = 0;
-	while(_g < lights.length) {
-		var light = lights[_g];
-		++_g;
-		if(i >= n) {
-			break;
-		}
-		if(!light.visible || light.data.raw.strength == 0.0 || light.data.raw.type == "sun") {
-			continue;
-		}
-		if(light.data.raw.type == type) {
-			var _this = iron_object_LightObject.m;
-			var m = light.VP;
-			_this.self._00 = m.self._00;
-			_this.self._01 = m.self._01;
-			_this.self._02 = m.self._02;
-			_this.self._03 = m.self._03;
-			_this.self._10 = m.self._10;
-			_this.self._11 = m.self._11;
-			_this.self._12 = m.self._12;
-			_this.self._13 = m.self._13;
-			_this.self._20 = m.self._20;
-			_this.self._21 = m.self._21;
-			_this.self._22 = m.self._22;
-			_this.self._23 = m.self._23;
-			_this.self._30 = m.self._30;
-			_this.self._31 = m.self._31;
-			_this.self._32 = m.self._32;
-			_this.self._33 = m.self._33;
-			var _this1 = iron_object_LightObject.m;
-			var m1 = iron_object_Uniforms.biasMat;
-			var a00 = _this1.self._00;
-			var a01 = _this1.self._01;
-			var a02 = _this1.self._02;
-			var a03 = _this1.self._03;
-			var a10 = _this1.self._10;
-			var a11 = _this1.self._11;
-			var a12 = _this1.self._12;
-			var a13 = _this1.self._13;
-			var a20 = _this1.self._20;
-			var a21 = _this1.self._21;
-			var a22 = _this1.self._22;
-			var a23 = _this1.self._23;
-			var a30 = _this1.self._30;
-			var a31 = _this1.self._31;
-			var a32 = _this1.self._32;
-			var a33 = _this1.self._33;
-			var b0 = m1.self._00;
-			var b1 = m1.self._10;
-			var b2 = m1.self._20;
-			var b3 = m1.self._30;
-			_this1.self._00 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-			_this1.self._10 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-			_this1.self._20 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-			_this1.self._30 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-			b0 = m1.self._01;
-			b1 = m1.self._11;
-			b2 = m1.self._21;
-			b3 = m1.self._31;
-			_this1.self._01 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-			_this1.self._11 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-			_this1.self._21 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-			_this1.self._31 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-			b0 = m1.self._02;
-			b1 = m1.self._12;
-			b2 = m1.self._22;
-			b3 = m1.self._32;
-			_this1.self._02 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-			_this1.self._12 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-			_this1.self._22 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-			_this1.self._32 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-			b0 = m1.self._03;
-			b1 = m1.self._13;
-			b2 = m1.self._23;
-			b3 = m1.self._33;
-			_this1.self._03 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-			_this1.self._13 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-			_this1.self._23 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-			_this1.self._33 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-			iron_object_LightObject.LWVPMatrixArray.setFloat32(i * 16 * 4,iron_object_LightObject.m.self._00,true);
-			iron_object_LightObject.LWVPMatrixArray.setFloat32((i * 16 + 1) * 4,iron_object_LightObject.m.self._01,true);
-			iron_object_LightObject.LWVPMatrixArray.setFloat32((i * 16 + 2) * 4,iron_object_LightObject.m.self._02,true);
-			iron_object_LightObject.LWVPMatrixArray.setFloat32((i * 16 + 3) * 4,iron_object_LightObject.m.self._03,true);
-			iron_object_LightObject.LWVPMatrixArray.setFloat32((i * 16 + 4) * 4,iron_object_LightObject.m.self._10,true);
-			iron_object_LightObject.LWVPMatrixArray.setFloat32((i * 16 + 5) * 4,iron_object_LightObject.m.self._11,true);
-			iron_object_LightObject.LWVPMatrixArray.setFloat32((i * 16 + 6) * 4,iron_object_LightObject.m.self._12,true);
-			iron_object_LightObject.LWVPMatrixArray.setFloat32((i * 16 + 7) * 4,iron_object_LightObject.m.self._13,true);
-			iron_object_LightObject.LWVPMatrixArray.setFloat32((i * 16 + 8) * 4,iron_object_LightObject.m.self._20,true);
-			iron_object_LightObject.LWVPMatrixArray.setFloat32((i * 16 + 9) * 4,iron_object_LightObject.m.self._21,true);
-			iron_object_LightObject.LWVPMatrixArray.setFloat32((i * 16 + 10) * 4,iron_object_LightObject.m.self._22,true);
-			iron_object_LightObject.LWVPMatrixArray.setFloat32((i * 16 + 11) * 4,iron_object_LightObject.m.self._23,true);
-			iron_object_LightObject.LWVPMatrixArray.setFloat32((i * 16 + 12) * 4,iron_object_LightObject.m.self._30,true);
-			iron_object_LightObject.LWVPMatrixArray.setFloat32((i * 16 + 13) * 4,iron_object_LightObject.m.self._31,true);
-			iron_object_LightObject.LWVPMatrixArray.setFloat32((i * 16 + 14) * 4,iron_object_LightObject.m.self._32,true);
-			iron_object_LightObject.LWVPMatrixArray.setFloat32((i * 16 + 15) * 4,iron_object_LightObject.m.self._33,true);
-		}
-		++i;
-	}
-	return iron_object_LightObject.LWVPMatrixArray;
 };
 iron_object_LightObject.__super__ = iron_object_Object;
 iron_object_LightObject.prototype = $extend(iron_object_Object.prototype,{
@@ -11646,6 +11438,7 @@ iron_object_LightObject.prototype = $extend(iron_object_Object.prototype,{
 	,__class__: iron_object_LightObject
 });
 var iron_object_MeshObject = function(data,materials) {
+	this.morphTarget = null;
 	this.force_context = null;
 	this.skip_context = null;
 	this.tilesheet = null;
@@ -11706,6 +11499,11 @@ iron_object_MeshObject.prototype = $extend(iron_object_Object.prototype,{
 			}
 		}
 		iron_object_Object.prototype.setupAnimation.call(this,oactions);
+	}
+	,setupMorphTargets: function() {
+		if(this.data.raw.morph_target != null) {
+			this.morphTarget = new iron_object_MorphTarget(this.data.raw.morph_target);
+		}
 	}
 	,setupParticleSystem: function(sceneName,pref) {
 		if(this.particleSystems == null) {
@@ -11949,6 +11747,42 @@ iron_object_MeshObject.prototype = $extend(iron_object_Object.prototype,{
 	}
 	,__class__: iron_object_MeshObject
 });
+var iron_object_MorphTarget = function(data) {
+	this.morphMap = null;
+	this.morphBlockSize = 0;
+	this.morphImageSize = 0;
+	this.numMorphTargets = 0;
+	var _gthis = this;
+	this.morphWeights = data.morph_target_defaults;
+	this.scaling = data.morph_scale;
+	this.offset = data.morph_offset;
+	this.numMorphTargets = data.num_morph_targets;
+	this.morphImageSize = data.morph_img_size;
+	this.morphBlockSize = data.morph_block_size;
+	iron_data_Data.getImage(data.morph_target_data_file + "_morph_pos.png",function(img) {
+		if(img != null) {
+			_gthis.morphDataPos = img;
+		}
+	});
+	iron_data_Data.getImage(data.morph_target_data_file + "_morph_nor.png",function(img) {
+		if(img != null) {
+			_gthis.morphDataNor = img;
+		}
+	});
+	this.morphMap = new haxe_ds_StringMap();
+	var i = 0;
+	var _g = 0;
+	var _g1 = data.morph_target_ref;
+	while(_g < _g1.length) {
+		this.morphMap.h[_g1[_g++]] = i;
+		++i;
+	}
+};
+$hxClasses["iron.object.MorphTarget"] = iron_object_MorphTarget;
+iron_object_MorphTarget.__name__ = true;
+iron_object_MorphTarget.prototype = {
+	__class__: iron_object_MorphTarget
+};
 var iron_object_ObjectAnimation = function(object,oactions) {
 	this.object = object;
 	this.oactions = oactions;
@@ -12363,33 +12197,125 @@ iron_object_ParticleSystem.prototype = {
 	,setupGeomGpu: function(object,owner) {
 		var instancedData = kha_arrays_Float32Array._new(this.particles.length * 3);
 		var i = 0;
-		if(this.r.emit_from == 0) {
+		var scaleFactorVol = owner.data.scalePos / this.r.particle_size;
+		var scaleFactorVertFace = 3.05185094759971923e-05 * scaleFactorVol;
+		switch(this.r.emit_from) {
+		case 0:
 			var pa = owner.data.geom.positions;
-			var sc = owner.data.scalePos;
 			var _g = 0;
 			var _g1 = this.particles;
 			while(_g < _g1.length) {
 				++_g;
 				var j = this.fhash(i) * ((pa.values.byteLength >> 1) / pa.size) | 0;
-				instancedData.setFloat32(i * 4,pa.values.getInt16(j * pa.size * 2,kha_arrays_ByteArray.LITTLE_ENDIAN) / 32767 * sc / this.r.particle_size,true);
+				instancedData.setFloat32(i * 4,pa.values.getInt16(j * pa.size * 2,kha_arrays_ByteArray.LITTLE_ENDIAN) * scaleFactorVertFace,true);
 				++i;
-				instancedData.setFloat32(i * 4,pa.values.getInt16((j * pa.size + 1) * 2,kha_arrays_ByteArray.LITTLE_ENDIAN) / 32767 * sc / this.r.particle_size,true);
+				instancedData.setFloat32(i * 4,pa.values.getInt16((j * pa.size + 1) * 2,kha_arrays_ByteArray.LITTLE_ENDIAN) * scaleFactorVertFace,true);
 				++i;
-				instancedData.setFloat32(i * 4,pa.values.getInt16((j * pa.size + 2) * 2,kha_arrays_ByteArray.LITTLE_ENDIAN) / 32767 * sc / this.r.particle_size,true);
+				instancedData.setFloat32(i * 4,pa.values.getInt16((j * pa.size + 2) * 2,kha_arrays_ByteArray.LITTLE_ENDIAN) * scaleFactorVertFace,true);
 				++i;
 			}
-		} else {
+			break;
+		case 1:
+			var positions = owner.data.geom.positions.values;
 			var _g = 0;
 			var _g1 = this.particles;
 			while(_g < _g1.length) {
 				++_g;
-				instancedData.setFloat32(i * 4,(Math.random() * 2.0 - 1.0) * (object.transform.dim.x / 2.0),true);
+				var ia = owner.data.geom.indices[Std.random(owner.data.geom.indices.length)];
+				var faceIndex = Std.random((ia.byteLength >> 2) / 3 | 0);
+				var i0 = ia.getUint32(faceIndex * 3 * 4,kha_arrays_ByteArray.LITTLE_ENDIAN);
+				var i1 = ia.getUint32((faceIndex * 3 + 1) * 4,kha_arrays_ByteArray.LITTLE_ENDIAN);
+				var i2 = ia.getUint32((faceIndex * 3 + 2) * 4,kha_arrays_ByteArray.LITTLE_ENDIAN);
+				var x = positions.getInt16(i0 * 4 * 2,kha_arrays_ByteArray.LITTLE_ENDIAN);
+				var y = positions.getInt16((i0 * 4 + 1) * 2,kha_arrays_ByteArray.LITTLE_ENDIAN);
+				var z = positions.getInt16((i0 * 4 + 2) * 2,kha_arrays_ByteArray.LITTLE_ENDIAN);
+				if(z == null) {
+					z = 0.0;
+				}
+				if(y == null) {
+					y = 0.0;
+				}
+				if(x == null) {
+					x = 0.0;
+				}
+				var pos_x = x;
+				var pos_y = y;
+				var pos_z = z;
+				var x1 = positions.getInt16(i1 * 4 * 2,kha_arrays_ByteArray.LITTLE_ENDIAN);
+				var y1 = positions.getInt16((i1 * 4 + 1) * 2,kha_arrays_ByteArray.LITTLE_ENDIAN);
+				var z1 = positions.getInt16((i1 * 4 + 2) * 2,kha_arrays_ByteArray.LITTLE_ENDIAN);
+				if(z1 == null) {
+					z1 = 0.0;
+				}
+				if(y1 == null) {
+					y1 = 0.0;
+				}
+				if(x1 == null) {
+					x1 = 0.0;
+				}
+				var v_x = x1;
+				var v_y = y1;
+				var v_z = z1;
+				var x2 = positions.getInt16(i2 * 4 * 2,kha_arrays_ByteArray.LITTLE_ENDIAN);
+				var y2 = positions.getInt16((i2 * 4 + 1) * 2,kha_arrays_ByteArray.LITTLE_ENDIAN);
+				var z2 = positions.getInt16((i2 * 4 + 2) * 2,kha_arrays_ByteArray.LITTLE_ENDIAN);
+				if(z2 == null) {
+					z2 = 0.0;
+				}
+				if(y2 == null) {
+					y2 = 0.0;
+				}
+				if(x2 == null) {
+					x2 = 0.0;
+				}
+				var v_x1 = x2;
+				var v_y1 = y2;
+				var v_z1 = z2;
+				var x3 = Math.random();
+				var y3 = Math.random();
+				if(x3 + y3 > 1) {
+					x3 = 1 - x3;
+					y3 = 1 - y3;
+				}
+				v_x -= pos_x;
+				v_y -= pos_y;
+				v_z -= pos_z;
+				v_x1 -= pos_x;
+				v_y1 -= pos_y;
+				v_z1 -= pos_z;
+				v_x *= x3;
+				v_y *= x3;
+				v_z *= x3;
+				v_x1 *= y3;
+				v_y1 *= y3;
+				v_z1 *= y3;
+				v_x += v_x1;
+				v_y += v_y1;
+				v_z += v_z1;
+				pos_x += v_x;
+				pos_y += v_y;
+				pos_z += v_z;
+				instancedData.setFloat32(i * 4,pos_x * scaleFactorVertFace,true);
 				++i;
-				instancedData.setFloat32(i * 4,(Math.random() * 2.0 - 1.0) * (object.transform.dim.y / 2.0),true);
+				instancedData.setFloat32(i * 4,pos_y * scaleFactorVertFace,true);
 				++i;
-				instancedData.setFloat32(i * 4,(Math.random() * 2.0 - 1.0) * (object.transform.dim.z / 2.0),true);
+				instancedData.setFloat32(i * 4,pos_z * scaleFactorVertFace,true);
 				++i;
 			}
+			break;
+		case 2:
+			var _g = 0;
+			var _g1 = this.particles;
+			while(_g < _g1.length) {
+				++_g;
+				instancedData.setFloat32(i * 4,(Math.random() * 2.0 - 1.0) * (object.transform.dim.x / 2.0) * scaleFactorVol,true);
+				++i;
+				instancedData.setFloat32(i * 4,(Math.random() * 2.0 - 1.0) * (object.transform.dim.y / 2.0) * scaleFactorVol,true);
+				++i;
+				instancedData.setFloat32(i * 4,(Math.random() * 2.0 - 1.0) * (object.transform.dim.z / 2.0) * scaleFactorVol,true);
+				++i;
+			}
+			break;
 		}
 		object.data.geom.setupInstanced(instancedData,1,0);
 	}
@@ -12412,9 +12338,9 @@ iron_object_Particle.prototype = {
 	__class__: iron_object_Particle
 };
 var iron_object_SpeakerObject = function(data) {
-	this.paused = false;
 	this.channels = [];
 	this.sound = null;
+	this.paused = false;
 	var _gthis = this;
 	iron_object_Object.call(this);
 	this.data = data;
@@ -12478,49 +12404,59 @@ iron_object_SpeakerObject.prototype = $extend(iron_object_Object.prototype,{
 			iron_App.removeUpdate($bind(this,this.update));
 			return;
 		}
-		var _this = iron_Scene.active.camera.transform.world;
-		var x = _this.self._30;
-		var y = _this.self._31;
-		var z = _this.self._32;
-		var w = _this.self._33;
-		if(w == null) {
-			w = 1.0;
+		if(this.data.attenuation > 0) {
+			var _this = iron_Scene.active.camera.transform.world;
+			var x = _this.self._30;
+			var y = _this.self._31;
+			var z = _this.self._32;
+			var w = _this.self._33;
+			if(w == null) {
+				w = 1.0;
+			}
+			if(z == null) {
+				z = 0.0;
+			}
+			if(y == null) {
+				y = 0.0;
+			}
+			if(x == null) {
+				x = 0.0;
+			}
+			var _this = this.transform.world;
+			var x1 = _this.self._30;
+			var y1 = _this.self._31;
+			var z1 = _this.self._32;
+			var w = _this.self._33;
+			if(w == null) {
+				w = 1.0;
+			}
+			if(z1 == null) {
+				z1 = 0.0;
+			}
+			if(y1 == null) {
+				y1 = 0.0;
+			}
+			if(x1 == null) {
+				x1 = 0.0;
+			}
+			var vx = x - x1;
+			var vy = y - y1;
+			var vz = z - z1;
+			var distance = Math.sqrt(vx * vx + vy * vy + vz * vz);
+			distance = Math.max(Math.min(this.data.distance_max,distance),this.data.distance_reference);
+			this.volume = this.data.distance_reference / (this.data.distance_reference + this.data.attenuation * (distance - this.data.distance_reference));
+			this.volume *= this.data.volume;
+		} else {
+			this.volume = this.data.volume;
 		}
-		if(z == null) {
-			z = 0.0;
+		if(this.volume > this.data.volume_max) {
+			this.volume = this.data.volume_max;
+		} else if(this.volume < this.data.volume_min) {
+			this.volume = this.data.volume_min;
 		}
-		if(y == null) {
-			y = 0.0;
-		}
-		if(x == null) {
-			x = 0.0;
-		}
-		var _this = this.transform.world;
-		var x1 = _this.self._30;
-		var y1 = _this.self._31;
-		var z1 = _this.self._32;
-		var w = _this.self._33;
-		if(w == null) {
-			w = 1.0;
-		}
-		if(z1 == null) {
-			z1 = 0.0;
-		}
-		if(y1 == null) {
-			y1 = 0.0;
-		}
-		if(x1 == null) {
-			x1 = 0.0;
-		}
-		var vx = x - x1;
-		var vy = y - y1;
-		var vz = z - z1;
-		var d = Math.sqrt(vx * vx + vy * vy + vz * vz);
-		d *= this.data.attenuation;
-		var vol = 1.0 - Math.min(d / 100,1);
 		var _g = 0;
 		var _g1 = this.channels;
-		while(_g < _g1.length) _g1[_g++].set_volume(vol * this.data.volume);
+		while(_g < _g1.length) _g1[_g++].set_volume(this.volume);
 	}
 	,remove: function() {
 		this.stop();
@@ -13428,85 +13364,60 @@ iron_object_Uniforms.setObjectConstants = function(g,context,object) {
 				if(tu.link == null) {
 					continue;
 				}
-				var s = tu.addressing_u;
 				var tuAddrU;
-				if(s == null) {
+				switch(tu.addressing_u) {
+				case "clamp":
+					tuAddrU = 2;
+					break;
+				case "mirror":
+					tuAddrU = 1;
+					break;
+				default:
 					tuAddrU = 0;
-				} else {
-					switch(s) {
-					case "clamp":
-						tuAddrU = 2;
-						break;
-					case "mirror":
-						tuAddrU = 1;
-						break;
-					default:
-						tuAddrU = 0;
-					}
 				}
-				var s1 = tu.addressing_v;
 				var tuAddrV;
-				if(s1 == null) {
+				switch(tu.addressing_v) {
+				case "clamp":
+					tuAddrV = 2;
+					break;
+				case "mirror":
+					tuAddrV = 1;
+					break;
+				default:
 					tuAddrV = 0;
-				} else {
-					switch(s1) {
-					case "clamp":
-						tuAddrV = 2;
-						break;
-					case "mirror":
-						tuAddrV = 1;
-						break;
-					default:
-						tuAddrV = 0;
-					}
 				}
-				var s2 = tu.filter_min;
 				var tuFilterMin;
-				if(s2 == null) {
+				switch(tu.filter_min) {
+				case "anisotropic":
+					tuFilterMin = 2;
+					break;
+				case "point":
+					tuFilterMin = 0;
+					break;
+				default:
 					tuFilterMin = 1;
-				} else {
-					switch(s2) {
-					case "anisotropic":
-						tuFilterMin = 2;
-						break;
-					case "point":
-						tuFilterMin = 0;
-						break;
-					default:
-						tuFilterMin = 1;
-					}
 				}
-				var s3 = tu.filter_mag;
 				var tuFilterMag;
-				if(s3 == null) {
+				switch(tu.filter_mag) {
+				case "anisotropic":
+					tuFilterMag = 2;
+					break;
+				case "point":
+					tuFilterMag = 0;
+					break;
+				default:
 					tuFilterMag = 1;
-				} else {
-					switch(s3) {
-					case "anisotropic":
-						tuFilterMag = 2;
-						break;
-					case "point":
-						tuFilterMag = 0;
-						break;
-					default:
-						tuFilterMag = 1;
-					}
 				}
-				var s4 = tu.mipmap_filter;
 				var tuMipMapFilter;
-				if(s4 == null) {
+				switch(tu.mipmap_filter) {
+				case "linear":
+					tuMipMapFilter = 2;
+					break;
+				case "point":
+					tuMipMapFilter = 1;
+					break;
+				default:
 					tuMipMapFilter = 0;
-				} else {
-					switch(s4) {
-					case "linear":
-						tuMipMapFilter = 2;
-						break;
-					case "point":
-						tuMipMapFilter = 1;
-						break;
-					default:
-						tuMipMapFilter = 0;
-					}
 				}
 				var _g2 = 0;
 				var _g3 = iron_object_Uniforms.externalTextureLinks;
@@ -14308,21 +14219,6 @@ iron_object_Uniforms.setContextConstant = function(g,location,c) {
 					v = iron_object_Uniforms.helpVec;
 				}
 				break;
-			case "_spotDirection":
-				var point = iron_RenderPath.active.point;
-				if(point != null) {
-					var _this = new iron_math_Vec4(point.V.self._02,point.V.self._12,point.V.self._22);
-					var n = Math.sqrt(_this.x * _this.x + _this.y * _this.y + _this.z * _this.z);
-					if(n > 0.0) {
-						var invN = 1.0 / n;
-						_this.x *= invN;
-						_this.y *= invN;
-						_this.z *= invN;
-					}
-					iron_object_Uniforms.helpVec = _this;
-					v = iron_object_Uniforms.helpVec;
-				}
-				break;
 			case "_sunColor":
 				var sun = iron_RenderPath.active.sun;
 				if(sun != null) {
@@ -14424,14 +14320,6 @@ iron_object_Uniforms.setContextConstant = function(g,location,c) {
 				if(light != null && light.data.raw.cast_shadow) {
 					v = iron_object_Uniforms.helpVec;
 					v.x = v.y = light.data.raw.shadowmap_size;
-				}
-				break;
-			case "_spotData":
-				var point = iron_RenderPath.active.point;
-				if(point != null) {
-					v = iron_object_Uniforms.helpVec;
-					v.x = point.data.raw.spot_size;
-					v.y = v.x - point.data.raw.spot_blend;
 				}
 				break;
 			case "_vec2x":
@@ -15811,12 +15699,29 @@ iron_object_Uniforms.setObjectConstant = function(g,object,location,c) {
 			_this.self._13 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
 			_this.self._23 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
 			_this.self._33 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-			iron_object_Uniforms.helpMat.self._00 = t.scale.x;
+			var x = t.scale.x;
+			var y = t.scale.y;
+			var z = t.scale.z;
+			if(z == null) {
+				z = 0.0;
+			}
+			if(y == null) {
+				y = 0.0;
+			}
+			if(x == null) {
+				x = 0.0;
+			}
+			var scl_x = x;
+			var scl_y = y;
+			var f = t.scaleWorld;
+			scl_x *= f;
+			scl_y *= f;
+			iron_object_Uniforms.helpMat.self._00 = scl_x;
 			iron_object_Uniforms.helpMat.self._20 = 0.0;
 			iron_object_Uniforms.helpMat.self._01 = 0.0;
 			iron_object_Uniforms.helpMat.self._21 = 0.0;
 			iron_object_Uniforms.helpMat.self._02 = 0.0;
-			iron_object_Uniforms.helpMat.self._22 = t.scale.z;
+			iron_object_Uniforms.helpMat.self._22 = scl_y;
 			var _this = iron_object_Uniforms.helpMat;
 			var m1 = camera.P;
 			var a00 = _this.self._00;
@@ -15939,15 +15844,34 @@ iron_object_Uniforms.setObjectConstant = function(g,object,location,c) {
 			_this.self._13 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
 			_this.self._23 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
 			_this.self._33 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-			iron_object_Uniforms.helpMat.self._00 = t.scale.x;
+			var x = t.scale.x;
+			var y = t.scale.y;
+			var z = t.scale.z;
+			if(z == null) {
+				z = 0.0;
+			}
+			if(y == null) {
+				y = 0.0;
+			}
+			if(x == null) {
+				x = 0.0;
+			}
+			var scl_x = x;
+			var scl_y = y;
+			var scl_z = z;
+			var f = t.scaleWorld;
+			scl_x *= f;
+			scl_y *= f;
+			scl_z *= f;
+			iron_object_Uniforms.helpMat.self._00 = scl_x;
 			iron_object_Uniforms.helpMat.self._10 = 0.0;
 			iron_object_Uniforms.helpMat.self._20 = 0.0;
 			iron_object_Uniforms.helpMat.self._01 = 0.0;
-			iron_object_Uniforms.helpMat.self._11 = t.scale.y;
+			iron_object_Uniforms.helpMat.self._11 = scl_y;
 			iron_object_Uniforms.helpMat.self._21 = 0.0;
 			iron_object_Uniforms.helpMat.self._02 = 0.0;
 			iron_object_Uniforms.helpMat.self._12 = 0.0;
-			iron_object_Uniforms.helpMat.self._22 = t.scale.z;
+			iron_object_Uniforms.helpMat.self._22 = scl_z;
 			var _this = iron_object_Uniforms.helpMat;
 			var m1 = camera.P;
 			var a00 = _this.self._00;
@@ -16000,226 +15924,6 @@ iron_object_Uniforms.setObjectConstant = function(g,object,location,c) {
 			_this.self._33 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
 			m = iron_object_Uniforms.helpMat;
 			break;
-		}
-		if(m == null) {
-			if(StringTools.startsWith(c.link,"_biasLightWorldViewProjectionMatrixSpot")) {
-				var light = iron_object_Uniforms.getSpot(HxOverrides.cca(c.link,c.link.length - 1) - 48);
-				if(light != null) {
-					if(object == null) {
-						var _this = iron_object_Uniforms.helpMat;
-						_this.self._00 = 1.0;
-						_this.self._01 = 0.0;
-						_this.self._02 = 0.0;
-						_this.self._03 = 0.0;
-						_this.self._10 = 0.0;
-						_this.self._11 = 1.0;
-						_this.self._12 = 0.0;
-						_this.self._13 = 0.0;
-						_this.self._20 = 0.0;
-						_this.self._21 = 0.0;
-						_this.self._22 = 1.0;
-						_this.self._23 = 0.0;
-						_this.self._30 = 0.0;
-						_this.self._31 = 0.0;
-						_this.self._32 = 0.0;
-						_this.self._33 = 1.0;
-					} else {
-						var _this = iron_object_Uniforms.helpMat;
-						var m1 = object.transform.worldUnpack;
-						_this.self._00 = m1.self._00;
-						_this.self._01 = m1.self._01;
-						_this.self._02 = m1.self._02;
-						_this.self._03 = m1.self._03;
-						_this.self._10 = m1.self._10;
-						_this.self._11 = m1.self._11;
-						_this.self._12 = m1.self._12;
-						_this.self._13 = m1.self._13;
-						_this.self._20 = m1.self._20;
-						_this.self._21 = m1.self._21;
-						_this.self._22 = m1.self._22;
-						_this.self._23 = m1.self._23;
-						_this.self._30 = m1.self._30;
-						_this.self._31 = m1.self._31;
-						_this.self._32 = m1.self._32;
-						_this.self._33 = m1.self._33;
-					}
-					var _this = iron_object_Uniforms.helpMat;
-					var m1 = light.VP;
-					var a00 = _this.self._00;
-					var a01 = _this.self._01;
-					var a02 = _this.self._02;
-					var a03 = _this.self._03;
-					var a10 = _this.self._10;
-					var a11 = _this.self._11;
-					var a12 = _this.self._12;
-					var a13 = _this.self._13;
-					var a20 = _this.self._20;
-					var a21 = _this.self._21;
-					var a22 = _this.self._22;
-					var a23 = _this.self._23;
-					var a30 = _this.self._30;
-					var a31 = _this.self._31;
-					var a32 = _this.self._32;
-					var a33 = _this.self._33;
-					var b0 = m1.self._00;
-					var b1 = m1.self._10;
-					var b2 = m1.self._20;
-					var b3 = m1.self._30;
-					_this.self._00 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-					_this.self._10 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-					_this.self._20 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-					_this.self._30 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-					b0 = m1.self._01;
-					b1 = m1.self._11;
-					b2 = m1.self._21;
-					b3 = m1.self._31;
-					_this.self._01 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-					_this.self._11 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-					_this.self._21 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-					_this.self._31 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-					b0 = m1.self._02;
-					b1 = m1.self._12;
-					b2 = m1.self._22;
-					b3 = m1.self._32;
-					_this.self._02 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-					_this.self._12 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-					_this.self._22 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-					_this.self._32 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-					b0 = m1.self._03;
-					b1 = m1.self._13;
-					b2 = m1.self._23;
-					b3 = m1.self._33;
-					_this.self._03 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-					_this.self._13 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-					_this.self._23 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-					_this.self._33 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-					var _this = iron_object_Uniforms.helpMat;
-					var m1 = iron_object_Uniforms.biasMat;
-					var a00 = _this.self._00;
-					var a01 = _this.self._01;
-					var a02 = _this.self._02;
-					var a03 = _this.self._03;
-					var a10 = _this.self._10;
-					var a11 = _this.self._11;
-					var a12 = _this.self._12;
-					var a13 = _this.self._13;
-					var a20 = _this.self._20;
-					var a21 = _this.self._21;
-					var a22 = _this.self._22;
-					var a23 = _this.self._23;
-					var a30 = _this.self._30;
-					var a31 = _this.self._31;
-					var a32 = _this.self._32;
-					var a33 = _this.self._33;
-					var b0 = m1.self._00;
-					var b1 = m1.self._10;
-					var b2 = m1.self._20;
-					var b3 = m1.self._30;
-					_this.self._00 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-					_this.self._10 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-					_this.self._20 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-					_this.self._30 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-					b0 = m1.self._01;
-					b1 = m1.self._11;
-					b2 = m1.self._21;
-					b3 = m1.self._31;
-					_this.self._01 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-					_this.self._11 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-					_this.self._21 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-					_this.self._31 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-					b0 = m1.self._02;
-					b1 = m1.self._12;
-					b2 = m1.self._22;
-					b3 = m1.self._32;
-					_this.self._02 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-					_this.self._12 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-					_this.self._22 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-					_this.self._32 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-					b0 = m1.self._03;
-					b1 = m1.self._13;
-					b2 = m1.self._23;
-					b3 = m1.self._33;
-					_this.self._03 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-					_this.self._13 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-					_this.self._23 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-					_this.self._33 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-					m = iron_object_Uniforms.helpMat;
-				}
-			}
-			if(StringTools.startsWith(c.link,"_biasLightViewProjectionMatrixSpot")) {
-				var light = iron_object_Uniforms.getSpot(HxOverrides.cca(c.link,c.link.length - 1) - 48);
-				if(light != null) {
-					var _this = iron_object_Uniforms.helpMat;
-					var m1 = light.VP;
-					_this.self._00 = m1.self._00;
-					_this.self._01 = m1.self._01;
-					_this.self._02 = m1.self._02;
-					_this.self._03 = m1.self._03;
-					_this.self._10 = m1.self._10;
-					_this.self._11 = m1.self._11;
-					_this.self._12 = m1.self._12;
-					_this.self._13 = m1.self._13;
-					_this.self._20 = m1.self._20;
-					_this.self._21 = m1.self._21;
-					_this.self._22 = m1.self._22;
-					_this.self._23 = m1.self._23;
-					_this.self._30 = m1.self._30;
-					_this.self._31 = m1.self._31;
-					_this.self._32 = m1.self._32;
-					_this.self._33 = m1.self._33;
-					var _this = iron_object_Uniforms.helpMat;
-					var m1 = iron_object_Uniforms.biasMat;
-					var a00 = _this.self._00;
-					var a01 = _this.self._01;
-					var a02 = _this.self._02;
-					var a03 = _this.self._03;
-					var a10 = _this.self._10;
-					var a11 = _this.self._11;
-					var a12 = _this.self._12;
-					var a13 = _this.self._13;
-					var a20 = _this.self._20;
-					var a21 = _this.self._21;
-					var a22 = _this.self._22;
-					var a23 = _this.self._23;
-					var a30 = _this.self._30;
-					var a31 = _this.self._31;
-					var a32 = _this.self._32;
-					var a33 = _this.self._33;
-					var b0 = m1.self._00;
-					var b1 = m1.self._10;
-					var b2 = m1.self._20;
-					var b3 = m1.self._30;
-					_this.self._00 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-					_this.self._10 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-					_this.self._20 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-					_this.self._30 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-					b0 = m1.self._01;
-					b1 = m1.self._11;
-					b2 = m1.self._21;
-					b3 = m1.self._31;
-					_this.self._01 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-					_this.self._11 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-					_this.self._21 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-					_this.self._31 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-					b0 = m1.self._02;
-					b1 = m1.self._12;
-					b2 = m1.self._22;
-					b3 = m1.self._32;
-					_this.self._02 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-					_this.self._12 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-					_this.self._22 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-					_this.self._32 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-					b0 = m1.self._03;
-					b1 = m1.self._13;
-					b2 = m1.self._23;
-					b3 = m1.self._33;
-					_this.self._03 = a00 * b0 + a01 * b1 + a02 * b2 + a03 * b3;
-					_this.self._13 = a10 * b0 + a11 * b1 + a12 * b2 + a13 * b3;
-					_this.self._23 = a20 * b0 + a21 * b1 + a22 * b2 + a23 * b3;
-					_this.self._33 = a30 * b0 + a31 * b1 + a32 * b2 + a33 * b3;
-					m = iron_object_Uniforms.helpMat;
-				}
-			}
 		}
 		if(m == null && iron_object_Uniforms.externalMat4Links != null) {
 			var _g = 0;
@@ -16415,10 +16119,22 @@ iron_object_Uniforms.setObjectConstant = function(g,object,location,c) {
 	} else if(c.type == "vec2") {
 		var vx = null;
 		var vy = null;
-		if(c.link == "_tilesheetOffset") {
+		switch(c.link) {
+		case "_morphDataDim":
+			var mt = (js_Boot.__cast(object , iron_object_MeshObject)).morphTarget;
+			vx = mt.numMorphTargets;
+			vy = mt.morphBlockSize / mt.morphImageSize;
+			break;
+		case "_morphScaleOffset":
+			var mt = (js_Boot.__cast(object , iron_object_MeshObject)).morphTarget;
+			vx = mt.scaling;
+			vy = mt.offset;
+			break;
+		case "_tilesheetOffset":
 			var ts = (js_Boot.__cast(object , iron_object_MeshObject)).tilesheet;
 			vx = ts.tileX;
 			vy = ts.tileY;
+			break;
 		}
 		if(vx == null && iron_object_Uniforms.externalVec2Links != null) {
 			var _g = 0;
@@ -16473,8 +16189,8 @@ iron_object_Uniforms.setObjectConstant = function(g,object,location,c) {
 	} else if(c.type == "floats") {
 		var fa = null;
 		switch(c.link) {
-		case "_biasLightWorldViewProjectionMatrixSpotArray":
-			fa = iron_object_LightObject.updateLWVPMatrixArray(object,"spot");
+		case "_morphWeights":
+			fa = (js_Boot.__cast(object , iron_object_MeshObject)).morphTarget.morphWeights;
 			break;
 		case "_skinBones":
 			if(object.animation != null) {
@@ -16558,23 +16274,6 @@ iron_object_Uniforms.setMaterialConstants = function(g,context,materialContext) 
 			}
 		}
 	}
-};
-iron_object_Uniforms.getSpot = function(index) {
-	var i = 0;
-	var _g = 0;
-	var _g1 = iron_Scene.active.lights;
-	while(_g < _g1.length) {
-		var l = _g1[_g];
-		++_g;
-		if(l.data.raw.type != "spot" && l.data.raw.type != "area") {
-			continue;
-		}
-		if(i == index) {
-			return l;
-		}
-		++i;
-	}
-	return null;
 };
 iron_object_Uniforms.currentMat = function(object) {
 	if(object != null && ((object) instanceof iron_object_MeshObject)) {
@@ -19209,11 +18908,6 @@ kha_Scheduler.start = function(restartTimers) {
 		restartTimers = false;
 	}
 	kha_Scheduler.vsync = kha_Window.get(0).get_vSynced();
-	var hz = kha_Display.get_primary().get_frequency();
-	if(hz >= 57 && hz <= 63) {
-		hz = 60;
-	}
-	kha_Scheduler.onedifhz = 1.0 / hz;
 	kha_Scheduler.stopped = false;
 	kha_Scheduler.resetTime();
 	kha_Scheduler.lastTime = kha_Scheduler.realTime() - kha_Scheduler.startTime;
@@ -19242,11 +18936,11 @@ kha_Scheduler.executeFrame = function() {
 				delta = kha_Scheduler.maxframetime;
 				frameEnd += delta;
 			} else if(kha_Scheduler.vsync) {
-				var frames = Math.round(delta / kha_Scheduler.onedifhz);
+				var frames = Math.round(delta / (1.0 / kha_Display.get_primary().get_frequency()));
 				if(frames < 1) {
 					return;
 				}
-				var realdif = frames * kha_Scheduler.onedifhz;
+				var realdif = frames * (1.0 / kha_Display.get_primary().get_frequency());
 				delta = realdif;
 				var _g = 0;
 				var _g1 = kha_Scheduler.DIF_COUNT - 2;
@@ -19934,7 +19628,7 @@ kha_SystemImpl.loadFinished = function(defaultWidth,defaultHeight) {
 		kha_SystemImpl.gl2 = true;
 		kha_Shaders.init();
 	} catch( _g ) {
-		haxe_Log.trace("Could not initialize WebGL 2, falling back to WebGL.",{ fileName : "kha/SystemImpl.hx", lineNumber : 376, className : "kha.SystemImpl", methodName : "loadFinished"});
+		haxe_Log.trace("Could not initialize WebGL 2, falling back to WebGL.",{ fileName : "kha/SystemImpl.hx", lineNumber : 378, className : "kha.SystemImpl", methodName : "loadFinished"});
 	}
 	if(!kha_SystemImpl.gl2) {
 		try {
@@ -19956,7 +19650,7 @@ kha_SystemImpl.loadFinished = function(defaultWidth,defaultHeight) {
 			gl = true;
 			kha_Shaders.init();
 		} catch( _g ) {
-			haxe_Log.trace("Could not initialize WebGL, falling back to <canvas>.",{ fileName : "kha/SystemImpl.hx", lineNumber : 404, className : "kha.SystemImpl", methodName : "loadFinished"});
+			haxe_Log.trace("Could not initialize WebGL, falling back to <canvas>.",{ fileName : "kha/SystemImpl.hx", lineNumber : 406, className : "kha.SystemImpl", methodName : "loadFinished"});
 		}
 	}
 	kha_SystemImpl.setCanvas(canvas);
@@ -20037,11 +19731,21 @@ kha_SystemImpl.initAnimate = function(callback) {
 	if(requestAnimationFrame == null) {
 		requestAnimationFrame = $window.msRequestAnimationFrame;
 	}
+	var isRefreshRateDetectionActive = false;
+	var lastTimestamp = 0.0;
+	var possibleRefreshRates = [30,60,75,90,120,144,240,340,360];
+	var _g = [];
+	var _g1 = 0;
+	var _g2 = possibleRefreshRates.length;
+	while(_g1 < _g2) {
+		++_g1;
+		_g.push(0);
+	}
+	var refreshRatesCounts = _g;
 	var animate = null;
 	animate = function(timestamp) {
-		var $window = window;
 		if(requestAnimationFrame == null) {
-			$window.setTimeout(animate,16.6666666666666679);
+			window.setTimeout(animate,16.6666666666666679);
 		} else {
 			requestAnimationFrame(animate);
 		}
@@ -20058,11 +19762,12 @@ kha_SystemImpl.initAnimate = function(callback) {
 		}
 		kha_Scheduler.executeFrame();
 		if(canvas.getContext != null) {
-			var displayWidth = canvas.clientWidth | 0;
-			var displayHeight = canvas.clientHeight | 0;
-			if(canvas.width != displayWidth || canvas.height != displayHeight) {
-				canvas.width = displayWidth;
-				canvas.height = displayHeight;
+			if(kha_SystemImpl.lastCanvasClientWidth != canvas.clientWidth || kha_SystemImpl.lastCanvasClientHeight != canvas.clientHeight) {
+				var scale = window.devicePixelRatio;
+				canvas.width = canvas.clientWidth * scale | 0;
+				canvas.height = canvas.clientHeight * scale | 0;
+				kha_SystemImpl.lastCanvasClientWidth = canvas.clientWidth;
+				kha_SystemImpl.lastCanvasClientHeight = canvas.clientHeight;
 			}
 			kha_System.render([kha_SystemImpl.frame]);
 			if(kha_SystemImpl.gl != null) {
@@ -20072,71 +19777,50 @@ kha_SystemImpl.initAnimate = function(callback) {
 				kha_SystemImpl.gl.colorMask(true,true,true,true);
 			}
 		}
-	};
-	var initialTimestamp = 0;
-	var prevTimestamp = 0;
-	var currentSamples = 0;
-	var timeDiffs = [];
-	var SAMPLE_COUNT = 90;
-	var MEAN_TRUNCATION_CUTOFF = 0.333333333333333315;
-	var roundToKnownRefreshRate = function(hz) {
-		var rates = [{ low : 27, high : 33, target : 30},{ low : 57, high : 63, target : 60},{ low : 72, high : 78, target : 75},{ low : 87, high : 93, target : 90},{ low : 117, high : 123, target : 120},{ low : 141, high : 147, target : 144},{ low : 237, high : 243, target : 240},{ low : 337, high : 343, target : 340},{ low : 357, high : 363, target : 360}];
-		var nearestHz = hz;
-		var _g = 0;
-		while(_g < rates.length) {
-			var rate = rates[_g];
-			++_g;
-			if(hz >= rate.low && hz <= rate.high) {
-				nearestHz = rate.target;
+		if(!isRefreshRateDetectionActive) {
+			return;
+		}
+		if(lastTimestamp == 0) {
+			lastTimestamp = timestamp;
+			return;
+		}
+		var fps = Math.floor(1000 / (timestamp - lastTimestamp));
+		if(kha_SystemImpl.estimatedRefreshRate < fps) {
+			kha_SystemImpl.estimatedRefreshRate = fps;
+		}
+		lastTimestamp = timestamp;
+		var _g3_current = 0;
+		var _g3_array = possibleRefreshRates;
+		while(_g3_current < _g3_array.length) {
+			var _g4_value = _g3_array[_g3_current];
+			var _g4_key = _g3_current++;
+			if(fps > _g4_value - 3 && fps < _g4_value + 3) {
+				refreshRatesCounts[_g4_key]++;
 			}
 		}
-		return nearestHz;
 	};
-	var detectRefreshRate = null;
-	detectRefreshRate = function(timestamp) {
-		var $window = window;
-		if(initialTimestamp == 0) {
-			initialTimestamp = timestamp;
-		}
-		var timeDifferential = timestamp - prevTimestamp - initialTimestamp;
-		prevTimestamp = timestamp - initialTimestamp;
-		if(timeDifferential != 0) {
-			timeDiffs.push(timeDifferential);
-		}
-		if(currentSamples < SAMPLE_COUNT) {
-			currentSamples += 1;
-			if(requestAnimationFrame == null) {
-				$window.setTimeout(detectRefreshRate,16.6666666666666679);
-			} else {
-				requestAnimationFrame(detectRefreshRate);
+	window.setTimeout(function() {
+		isRefreshRateDetectionActive = true;
+		return window.setTimeout(function() {
+			isRefreshRateDetectionActive = false;
+			var index = possibleRefreshRates.indexOf(60);
+			var max = 0;
+			var _g3_current = 0;
+			var _g3_array = refreshRatesCounts;
+			while(_g3_current < _g3_array.length) {
+				var _g4_value = _g3_array[_g3_current];
+				var _g4_key = _g3_current++;
+				if(_g4_value > max) {
+					max = _g4_value;
+					index = _g4_key;
+				}
 			}
-		} else {
-			haxe_ds_ArraySort.sort(timeDiffs,function(a,b) {
-				return a - b;
-			});
-			var truncatedTimeDiffs = [];
-			var cutoff = Math.round(timeDiffs.length * MEAN_TRUNCATION_CUTOFF);
-			var _g = cutoff;
-			var _g1 = timeDiffs.length - cutoff;
-			while(_g < _g1) truncatedTimeDiffs.push(timeDiffs[_g++]);
-			var total = 0;
-			var _g = 0;
-			while(_g < truncatedTimeDiffs.length) total += truncatedTimeDiffs[_g++];
-			kha_SystemImpl.estimatedRefreshRate = roundToKnownRefreshRate(Math.round(1000 / (total / truncatedTimeDiffs.length)));
-			kha_Scheduler.start();
-			if(requestAnimationFrame == null) {
-				$window.setTimeout(animate,16.6666666666666679);
-			} else {
-				requestAnimationFrame(animate);
-			}
-			callback(kha_SystemImpl.window);
-		}
-	};
-	if(requestAnimationFrame == null) {
-		$window.setTimeout(detectRefreshRate,16.6666666666666679);
-	} else {
-		requestAnimationFrame(detectRefreshRate);
-	}
+			return kha_SystemImpl.estimatedRefreshRate = possibleRefreshRates[index];
+		},1000);
+	},500);
+	kha_Scheduler.start();
+	requestAnimationFrame(animate);
+	callback(kha_SystemImpl.window);
 };
 kha_SystemImpl.lockMouse = function() {
 	if(($_=kha_SystemImpl.khanvas,$bind($_,$_.requestPointerLock))) {
@@ -20211,7 +19895,7 @@ kha_SystemImpl.unlockSound = function() {
 			context.resume().then(function(c) {
 				kha_SystemImpl.soundEnabled = true;
 			}).catch(function(err) {
-				haxe_Log.trace(err,{ fileName : "kha/SystemImpl.hx", lineNumber : 738, className : "kha.SystemImpl", methodName : "unlockSound"});
+				haxe_Log.trace(err,{ fileName : "kha/SystemImpl.hx", lineNumber : 685, className : "kha.SystemImpl", methodName : "unlockSound"});
 			});
 		}
 		kha_audio2_Audio.wakeChannels();
@@ -20260,11 +19944,7 @@ kha_SystemImpl.mouseDown = function(event) {
 	kha_SystemImpl.setMouseXY(event);
 	if(event.which == 1) {
 		kha_SystemImpl.mouse.sendDownEvent(0,0,kha_SystemImpl.mouseX,kha_SystemImpl.mouseY);
-		if(kha_SystemImpl.khanvas.setCapture != null) {
-			kha_SystemImpl.khanvas.setCapture();
-		} else {
-			kha_SystemImpl.khanvas.ownerDocument.addEventListener("mousemove",kha_SystemImpl.documentMouseMove,true);
-		}
+		kha_SystemImpl.khanvas.ownerDocument.addEventListener("mousemove",kha_SystemImpl.documentMouseMove,true);
 		kha_SystemImpl.khanvas.ownerDocument.addEventListener("mouseup",kha_SystemImpl.mouseLeftUp);
 	} else if(event.which == 2) {
 		kha_SystemImpl.mouse.sendDownEvent(0,2,kha_SystemImpl.mouseX,kha_SystemImpl.mouseY);
@@ -20288,11 +19968,7 @@ kha_SystemImpl.mouseLeftUp = function(event) {
 	}
 	kha_SystemImpl.insideInputEvent = true;
 	kha_SystemImpl.khanvas.ownerDocument.removeEventListener("mouseup",kha_SystemImpl.mouseLeftUp);
-	if(kha_SystemImpl.khanvas.releaseCapture != null) {
-		kha_SystemImpl.khanvas.ownerDocument.releaseCapture();
-	} else {
-		kha_SystemImpl.khanvas.ownerDocument.removeEventListener("mousemove",kha_SystemImpl.documentMouseMove,true);
-	}
+	kha_SystemImpl.khanvas.ownerDocument.removeEventListener("mousemove",kha_SystemImpl.documentMouseMove,true);
 	kha_SystemImpl.mouse.sendUpEvent(0,0,kha_SystemImpl.mouseX,kha_SystemImpl.mouseY);
 	kha_SystemImpl.insideInputEvent = false;
 };
@@ -21023,7 +20699,7 @@ var kha_Window = function(num,defaultWidth,defaultHeight,canvas) {
 			}
 		}
 		if(isResize) {
-			_gthis.resize(canvas.clientWidth,canvas.clientHeight);
+			_gthis.resize(canvas.width,canvas.height);
 		}
 	}).observe(canvas,{ attributes : true});
 };
@@ -25358,7 +25034,7 @@ kha_graphics2_Graphics.prototype = {
 	,drawScaledImage: function(img,dx,dy,dw,dh) {
 		this.drawScaledSubImage(img,0,0,img.get_width(),img.get_height(),dx,dy,dw,dh);
 	}
-	,drawScaledSubImage: function(image,sx,sy,sw,sh,dx,dy,dw,dh) {
+	,drawScaledSubImage: function(img,sx,sy,sw,sh,dx,dy,dw,dh) {
 	}
 	,drawRect: function(x,y,width,height,strength) {
 		if(strength == null) {
@@ -32493,14 +32169,14 @@ var kha_graphics4_SimplePipelineCache = function(pipeline,texture) {
 	try {
 		projectionLocation = pipeline.getConstantLocation("projectionMatrix");
 	} catch( _g ) {
-		haxe_Log.trace(haxe_Exception.caught(_g).unwrap(),{ fileName : "kha/graphics4/Graphics2.hx", lineNumber : 57, className : "kha.graphics4.SimplePipelineCache", methodName : "new"});
+		haxe_Log.trace(haxe_Exception.caught(_g).unwrap(),{ fileName : "kha/graphics4/Graphics2.hx", lineNumber : 58, className : "kha.graphics4.SimplePipelineCache", methodName : "new"});
 	}
 	var textureLocation = null;
 	if(texture) {
 		try {
 			textureLocation = pipeline.getTextureUnit("tex");
 		} catch( _g ) {
-			haxe_Log.trace(haxe_Exception.caught(_g).unwrap(),{ fileName : "kha/graphics4/Graphics2.hx", lineNumber : 66, className : "kha.graphics4.SimplePipelineCache", methodName : "new"});
+			haxe_Log.trace(haxe_Exception.caught(_g).unwrap(),{ fileName : "kha/graphics4/Graphics2.hx", lineNumber : 67, className : "kha.graphics4.SimplePipelineCache", methodName : "new"});
 		}
 	}
 	this.pipeline = new kha_graphics4_InternalPipeline(pipeline,projectionLocation,textureLocation);
@@ -32521,14 +32197,14 @@ var kha_graphics4_PerFramebufferPipelineCache = function(pipeline,texture) {
 	try {
 		projectionLocation = pipeline.getConstantLocation("projectionMatrix");
 	} catch( _g ) {
-		haxe_Log.trace(haxe_Exception.caught(_g).unwrap(),{ fileName : "kha/graphics4/Graphics2.hx", lineNumber : 89, className : "kha.graphics4.PerFramebufferPipelineCache", methodName : "new"});
+		haxe_Log.trace(haxe_Exception.caught(_g).unwrap(),{ fileName : "kha/graphics4/Graphics2.hx", lineNumber : 90, className : "kha.graphics4.PerFramebufferPipelineCache", methodName : "new"});
 	}
 	var textureLocation = null;
 	if(texture) {
 		try {
 			textureLocation = pipeline.getTextureUnit("tex");
 		} catch( _g ) {
-			haxe_Log.trace(haxe_Exception.caught(_g).unwrap(),{ fileName : "kha/graphics4/Graphics2.hx", lineNumber : 98, className : "kha.graphics4.PerFramebufferPipelineCache", methodName : "new"});
+			haxe_Log.trace(haxe_Exception.caught(_g).unwrap(),{ fileName : "kha/graphics4/Graphics2.hx", lineNumber : 99, className : "kha.graphics4.PerFramebufferPipelineCache", methodName : "new"});
 		}
 	}
 	this.pipelines.push(new kha_graphics4_InternalPipeline(pipeline,projectionLocation,textureLocation));
@@ -32689,73 +32365,73 @@ kha_graphics4_ColoredShaderPainter.prototype = {
 		}
 	}
 	,setRectVertices: function(bottomleftx,bottomlefty,topleftx,toplefty,toprightx,toprighty,bottomrightx,bottomrighty) {
-		var baseIndex = kha_graphics4_ColoredShaderPainter.bufferIndex * 7 * 4;
+		var baseIndex = kha_graphics4_ColoredShaderPainter.bufferIndex * 4 * 4;
 		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32(baseIndex * 4,bottomleftx,true);
 		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 1) * 4,bottomlefty,true);
 		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 2) * 4,-5.0,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 7) * 4,topleftx,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 8) * 4,toplefty,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 9) * 4,-5.0,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 14) * 4,toprightx,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 15) * 4,toprighty,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 16) * 4,-5.0,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 21) * 4,bottomrightx,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 22) * 4,bottomrighty,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 23) * 4,-5.0,true);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 4) * 4,topleftx,true);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 5) * 4,toplefty,true);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 6) * 4,-5.0,true);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 8) * 4,toprightx,true);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 9) * 4,toprighty,true);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 10) * 4,-5.0,true);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 12) * 4,bottomrightx,true);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 13) * 4,bottomrighty,true);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 14) * 4,-5.0,true);
 	}
 	,setRectColors: function(opacity,color) {
-		var baseIndex = kha_graphics4_ColoredShaderPainter.bufferIndex * 7 * 4;
+		var baseIndex = kha_graphics4_ColoredShaderPainter.bufferIndex * 4 * 4 * 4;
 		var a = opacity * ((color >>> 24) * 0.00392156862745098);
 		var r = a * (((color & 16711680) >>> 16) * 0.00392156862745098);
 		var g = a * (((color & 65280) >>> 8) * 0.00392156862745098);
 		var b = a * ((color & 255) * 0.00392156862745098);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 3) * 4,r,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 4) * 4,g,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 5) * 4,b,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 6) * 4,a,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 10) * 4,r,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 11) * 4,g,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 12) * 4,b,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 13) * 4,a,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 17) * 4,r,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 18) * 4,g,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 19) * 4,b,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 20) * 4,a,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 24) * 4,r,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 25) * 4,g,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 26) * 4,b,true);
-		kha_graphics4_ColoredShaderPainter.rectVertices.setFloat32((baseIndex + 27) * 4,a,true);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 12,r * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 12 + 1,g * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 12 + 2,b * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 12 + 3,a * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 28,r * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 28 + 1,g * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 28 + 2,b * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 28 + 3,a * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 44,r * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 44 + 1,g * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 44 + 2,b * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 44 + 3,a * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 60,r * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 60 + 1,g * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 60 + 2,b * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.rectVertices.setUint8(baseIndex + 60 + 3,a * 255 | 0);
 	}
 	,setTriVertices: function(x1,y1,x2,y2,x3,y3) {
-		var baseIndex = kha_graphics4_ColoredShaderPainter.triangleBufferIndex * 7 * 3;
+		var baseIndex = kha_graphics4_ColoredShaderPainter.triangleBufferIndex * 4 * 3;
 		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32(baseIndex * 4,x1,true);
 		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 1) * 4,y1,true);
 		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 2) * 4,-5.0,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 7) * 4,x2,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 8) * 4,y2,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 9) * 4,-5.0,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 14) * 4,x3,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 15) * 4,y3,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 16) * 4,-5.0,true);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 4) * 4,x2,true);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 5) * 4,y2,true);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 6) * 4,-5.0,true);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 8) * 4,x3,true);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 9) * 4,y3,true);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 10) * 4,-5.0,true);
 	}
 	,setTriColors: function(opacity,color) {
-		var baseIndex = kha_graphics4_ColoredShaderPainter.triangleBufferIndex * 7 * 3;
+		var baseIndex = kha_graphics4_ColoredShaderPainter.triangleBufferIndex * 4 * 4 * 3;
 		var a = opacity * ((color >>> 24) * 0.00392156862745098);
 		var r = a * (((color & 16711680) >>> 16) * 0.00392156862745098);
 		var g = a * (((color & 65280) >>> 8) * 0.00392156862745098);
 		var b = a * ((color & 255) * 0.00392156862745098);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 3) * 4,r,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 4) * 4,g,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 5) * 4,b,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 6) * 4,a,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 10) * 4,r,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 11) * 4,g,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 12) * 4,b,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 13) * 4,a,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 17) * 4,r,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 18) * 4,g,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 19) * 4,b,true);
-		kha_graphics4_ColoredShaderPainter.triangleVertices.setFloat32((baseIndex + 20) * 4,a,true);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setUint8(baseIndex + 12,r * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setUint8(baseIndex + 12 + 1,g * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setUint8(baseIndex + 12 + 2,b * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setUint8(baseIndex + 12 + 3,a * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setUint8(baseIndex + 28,r * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setUint8(baseIndex + 28 + 1,g * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setUint8(baseIndex + 28 + 2,b * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setUint8(baseIndex + 28 + 3,a * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setUint8(baseIndex + 44,r * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setUint8(baseIndex + 44 + 1,g * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setUint8(baseIndex + 44 + 2,b * 255 | 0);
+		kha_graphics4_ColoredShaderPainter.triangleVertices.setUint8(baseIndex + 44 + 3,a * 255 | 0);
 	}
 	,drawBuffer: function(trisDone) {
 		if(kha_graphics4_ColoredShaderPainter.bufferIndex == 0) {
@@ -33105,7 +32781,7 @@ kha_graphics4_Graphics2.createImageVertexStructure = function() {
 	var structure = new kha_graphics4_VertexStructure();
 	structure.add("vertexPosition",2);
 	structure.add("vertexUV",1);
-	structure.add("vertexColor",3);
+	structure.add("vertexColor",16);
 	return structure;
 };
 kha_graphics4_Graphics2.createImagePipeline = function(structure) {
@@ -33122,7 +32798,7 @@ kha_graphics4_Graphics2.createImagePipeline = function(structure) {
 kha_graphics4_Graphics2.createColoredVertexStructure = function() {
 	var structure = new kha_graphics4_VertexStructure();
 	structure.add("vertexPosition",2);
-	structure.add("vertexColor",3);
+	structure.add("vertexColor",16);
 	return structure;
 };
 kha_graphics4_Graphics2.createColoredPipeline = function(structure) {
@@ -33333,47 +33009,47 @@ kha_graphics4_Graphics2.prototype = $extend(kha_graphics2_Graphics.prototype,{
 		var g = ((color & 65280) >>> 8) * 0.00392156862745098;
 		var b = (color & 255) * 0.00392156862745098;
 		var a = (color >>> 24) * 0.00392156862745098 * opacity;
-		var baseIndex = (kha_graphics4_ImageShaderPainter.bufferIndex - kha_graphics4_ImageShaderPainter.bufferStart) * 9 * 4;
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 5) * 4,r,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 6) * 4,g,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 7) * 4,b,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 8) * 4,a,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 14) * 4,r,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 15) * 4,g,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 16) * 4,b,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 17) * 4,a,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 23) * 4,r,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 24) * 4,g,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 25) * 4,b,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 26) * 4,a,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 32) * 4,r,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 33) * 4,g,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 34) * 4,b,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 35) * 4,a,true);
+		var baseIndex = (kha_graphics4_ImageShaderPainter.bufferIndex - kha_graphics4_ImageShaderPainter.bufferStart) * 6 * 4 * 4;
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 20,r * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 20 + 1,g * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 20 + 2,b * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 20 + 3,a * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 44,r * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 44 + 1,g * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 44 + 2,b * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 44 + 3,a * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 68,r * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 68 + 1,g * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 68 + 2,b * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 68 + 3,a * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 92,r * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 92 + 1,g * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 92 + 2,b * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 92 + 3,a * 255 | 0);
 		var right = img.get_width() / img.get_realWidth();
 		var bottom = img.get_height() / img.get_realHeight();
-		var baseIndex = (kha_graphics4_ImageShaderPainter.bufferIndex - kha_graphics4_ImageShaderPainter.bufferStart) * 9 * 4;
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 3) * 4,0,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 4) * 4,bottom,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 12) * 4,0,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 13) * 4,0,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 21) * 4,right,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 22) * 4,0,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 30) * 4,right,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 31) * 4,bottom,true);
-		var baseIndex = (kha_graphics4_ImageShaderPainter.bufferIndex - kha_graphics4_ImageShaderPainter.bufferStart) * 9 * 4;
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex * 4,x2,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 1) * 4,y2,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 2) * 4,-5.0,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 9) * 4,x1,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 10) * 4,y3,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 11) * 4,-5.0,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 18) * 4,x3,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 19) * 4,y1,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 20) * 4,-5.0,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 27) * 4,x4,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 28) * 4,y4,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 29) * 4,-5.0,true);
+		var baseIndex = (kha_graphics4_ImageShaderPainter.bufferIndex - kha_graphics4_ImageShaderPainter.bufferStart) * 6 * 4 * 4;
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 12,0,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 16,bottom,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 36,0,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 40,0,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 60,right,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 64,0,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 84,right,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 88,bottom,true);
+		var baseIndex = (kha_graphics4_ImageShaderPainter.bufferIndex - kha_graphics4_ImageShaderPainter.bufferStart) * 6 * 4 * 4;
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex,x2,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 4,y2,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 8,-5.0,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 24,x1,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 28,y3,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 32,-5.0,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 48,x3,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 52,y1,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 56,-5.0,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 72,x4,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 76,y4,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 80,-5.0,true);
 		++kha_graphics4_ImageShaderPainter.bufferIndex;
 		kha_graphics4_ImageShaderPainter.lastTexture = img;
 	}
@@ -33484,49 +33160,49 @@ kha_graphics4_Graphics2.prototype = $extend(kha_graphics2_Graphics.prototype,{
 		var top = sy / img.get_realHeight();
 		var right = (sx + sw) / img.get_realWidth();
 		var bottom = (sy + sh) / img.get_realHeight();
-		var baseIndex = (kha_graphics4_ImageShaderPainter.bufferIndex - kha_graphics4_ImageShaderPainter.bufferStart) * 9 * 4;
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 3) * 4,left,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 4) * 4,bottom,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 12) * 4,left,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 13) * 4,top,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 21) * 4,right,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 22) * 4,top,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 30) * 4,right,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 31) * 4,bottom,true);
+		var baseIndex = (kha_graphics4_ImageShaderPainter.bufferIndex - kha_graphics4_ImageShaderPainter.bufferStart) * 6 * 4 * 4;
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 12,left,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 16,bottom,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 36,left,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 40,top,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 60,right,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 64,top,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 84,right,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 88,bottom,true);
 		var r = ((color & 16711680) >>> 16) * 0.00392156862745098;
 		var g = ((color & 65280) >>> 8) * 0.00392156862745098;
 		var b = (color & 255) * 0.00392156862745098;
 		var a = (color >>> 24) * 0.00392156862745098 * opacity;
-		var baseIndex = (kha_graphics4_ImageShaderPainter.bufferIndex - kha_graphics4_ImageShaderPainter.bufferStart) * 9 * 4;
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 5) * 4,r,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 6) * 4,g,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 7) * 4,b,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 8) * 4,a,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 14) * 4,r,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 15) * 4,g,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 16) * 4,b,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 17) * 4,a,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 23) * 4,r,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 24) * 4,g,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 25) * 4,b,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 26) * 4,a,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 32) * 4,r,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 33) * 4,g,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 34) * 4,b,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 35) * 4,a,true);
-		var baseIndex = (kha_graphics4_ImageShaderPainter.bufferIndex - kha_graphics4_ImageShaderPainter.bufferStart) * 9 * 4;
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex * 4,x1,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 1) * 4,y1,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 2) * 4,-5.0,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 9) * 4,x2,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 10) * 4,y2,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 11) * 4,-5.0,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 18) * 4,x3,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 19) * 4,y3,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 20) * 4,-5.0,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 27) * 4,x4,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 28) * 4,y4,true);
-		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32((baseIndex + 29) * 4,-5.0,true);
+		var baseIndex = (kha_graphics4_ImageShaderPainter.bufferIndex - kha_graphics4_ImageShaderPainter.bufferStart) * 6 * 4 * 4;
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 20,r * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 20 + 1,g * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 20 + 2,b * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 20 + 3,a * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 44,r * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 44 + 1,g * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 44 + 2,b * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 44 + 3,a * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 68,r * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 68 + 1,g * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 68 + 2,b * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 68 + 3,a * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 92,r * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 92 + 1,g * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 92 + 2,b * 255 | 0);
+		kha_graphics4_ImageShaderPainter.rectVertices.setUint8(baseIndex + 92 + 3,a * 255 | 0);
+		var baseIndex = (kha_graphics4_ImageShaderPainter.bufferIndex - kha_graphics4_ImageShaderPainter.bufferStart) * 6 * 4 * 4;
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex,x1,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 4,y1,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 8,-5.0,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 24,x2,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 28,y2,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 32,-5.0,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 48,x3,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 52,y3,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 56,-5.0,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 72,x4,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 76,y4,true);
+		kha_graphics4_ImageShaderPainter.rectVertices.setFloat32(baseIndex + 80,-5.0,true);
 		++kha_graphics4_ImageShaderPainter.bufferIndex;
 		kha_graphics4_ImageShaderPainter.lastTexture = img;
 	}
@@ -34524,29 +34200,7 @@ var kha_graphics4_VertexBuffer = function(vertexCount,structure,usage,instanceDa
 	this.myStride = 0;
 	var _g = 0;
 	var _g1 = structure.elements;
-	while(_g < _g1.length) switch(_g1[_g++].data) {
-	case 0:
-		this.myStride += 4;
-		break;
-	case 1:
-		this.myStride += 8;
-		break;
-	case 2:
-		this.myStride += 12;
-		break;
-	case 3:
-		this.myStride += 16;
-		break;
-	case 4:
-		this.myStride += 64;
-		break;
-	case 5:
-		this.myStride += 4;
-		break;
-	case 6:
-		this.myStride += 8;
-		break;
-	}
+	while(_g < _g1.length) this.myStride += kha_graphics4_VertexStructure.dataByteSize(_g1[_g++].data);
 	this.buffer = kha_SystemImpl.gl.createBuffer();
 	this._data = kha_arrays_ByteArray.make(vertexCount * this.myStride);
 	this.sizes = [];
@@ -34585,41 +34239,91 @@ var kha_graphics4_VertexBuffer = function(vertexCount,structure,usage,instanceDa
 			size = 16;
 			type = 5126;
 			break;
-		case 5:
+		case 5:case 7:
+			size = 1;
+			type = 5120;
+			break;
+		case 6:case 8:
+			size = 1;
+			type = 5121;
+			break;
+		case 10:case 12:
+			size = 2;
+			type = 5121;
+			break;
+		case 9:case 11:
+			size = 2;
+			type = 5120;
+			break;
+		case 13:case 15:
+			size = 4;
+			type = 5120;
+			break;
+		case 14:case 16:
+			size = 4;
+			type = 5121;
+			break;
+		case 17:case 19:
+			size = 1;
+			type = 5122;
+			break;
+		case 18:case 20:
+			size = 1;
+			type = 5123;
+			break;
+		case 21:case 23:
 			size = 2;
 			type = 5122;
 			break;
-		case 6:
+		case 22:case 24:
+			size = 2;
+			type = 5123;
+			break;
+		case 25:case 27:
 			size = 4;
 			type = 5122;
+			break;
+		case 26:case 28:
+			size = 4;
+			type = 5123;
+			break;
+		case 29:
+			size = 1;
+			type = 5124;
+			break;
+		case 30:
+			size = 1;
+			type = 5125;
+			break;
+		case 31:
+			size = 2;
+			type = 5124;
+			break;
+		case 32:
+			size = 2;
+			type = 5125;
+			break;
+		case 33:
+			size = 3;
+			type = 5124;
+			break;
+		case 34:
+			size = 3;
+			type = 5125;
+			break;
+		case 35:
+			size = 4;
+			type = 5124;
+			break;
+		case 36:
+			size = 4;
+			type = 5125;
 			break;
 		}
 		this.sizes[index] = size;
 		this.offsets[index] = offset;
 		this.types[index] = type;
-		switch(element.data) {
-		case 0:
-			offset += 4;
-			break;
-		case 1:
-			offset += 8;
-			break;
-		case 2:
-			offset += 12;
-			break;
-		case 3:
-			offset += 16;
-			break;
-		case 4:
-			offset += 64;
-			break;
-		case 5:
-			offset += 4;
-			break;
-		case 6:
-			offset += 8;
-			break;
-		}
+		offset += kha_graphics4_VertexStructure.dataByteSize(element.data);
 		++index;
 	}
 	kha_SystemImpl.gl.bindBuffer(34962,this.buffer);
@@ -34731,6 +34435,40 @@ var kha_graphics4_VertexStructure = function() {
 };
 $hxClasses["kha.graphics4.VertexStructure"] = kha_graphics4_VertexStructure;
 kha_graphics4_VertexStructure.__name__ = true;
+kha_graphics4_VertexStructure.dataByteSize = function(data) {
+	switch(data) {
+	case 0:
+		return 4;
+	case 1:
+		return 8;
+	case 2:
+		return 12;
+	case 3:
+		return 16;
+	case 4:
+		return 64;
+	case 5:case 6:case 7:case 8:
+		return 1;
+	case 9:case 10:case 11:case 12:
+		return 2;
+	case 13:case 14:case 15:case 16:
+		return 4;
+	case 17:case 18:case 19:case 20:
+		return 2;
+	case 21:case 22:case 23:case 24:
+		return 4;
+	case 25:case 26:case 27:case 28:
+		return 8;
+	case 29:case 30:
+		return 4;
+	case 31:case 32:
+		return 8;
+	case 33:case 34:
+		return 12;
+	case 35:case 36:
+		return 16;
+	}
+};
 kha_graphics4_VertexStructure.prototype = {
 	add: function(name,data) {
 		this.elements.push(new kha_graphics4_VertexElement(name,data));
@@ -34742,26 +34480,8 @@ kha_graphics4_VertexStructure.prototype = {
 		var byteSize = 0;
 		var _g = 0;
 		var _g1 = this.elements.length;
-		while(_g < _g1) byteSize += this.dataByteSize(this.elements[_g++].data);
+		while(_g < _g1) byteSize += kha_graphics4_VertexStructure.dataByteSize(this.elements[_g++].data);
 		return byteSize;
-	}
-	,dataByteSize: function(data) {
-		switch(data) {
-		case 0:
-			return 4;
-		case 1:
-			return 8;
-		case 2:
-			return 12;
-		case 3:
-			return 16;
-		case 4:
-			return 64;
-		case 5:
-			return 4;
-		case 6:
-			return 8;
-		}
 	}
 	,get: function(index) {
 		return this.elements[index];
@@ -37520,11 +37240,23 @@ zui_Zui.prototype = {
 		}
 		var fullText = text;
 		if(truncation) {
-			while(text.length > 0 && this.ops.font.width(this.fontSize,text) > this._w - 6) text = HxOverrides.substr(text,0,text.length - 1);
+			while(text.length > 0 && this.ops.font.width(this.fontSize,text) > this._w - 6 * this.ops.scaleFactor) text = HxOverrides.substr(text,0,text.length - 1);
 			if(text.length < fullText.length) {
 				text += "..";
+				while(text.length > 2 && this.ops.font.width(this.fontSize,text) > this._w - 10 * this.ops.scaleFactor) text = HxOverrides.substr(text,0,text.length - 3) + "..";
 				if(this.isHovered) {
 					this.tooltip(fullText);
+				}
+			}
+		}
+		if(zui_Zui.dynamicGlyphLoad) {
+			var _g = 0;
+			var _g1 = text.length;
+			while(_g < _g1) {
+				var i = _g++;
+				if(HxOverrides.cca(text,i) > 126 && kha_graphics2_Graphics.fontGlyphs.indexOf(HxOverrides.cca(text,i)) == -1) {
+					kha_graphics2_Graphics.fontGlyphs.push(HxOverrides.cca(text,i));
+					kha_graphics2_Graphics.fontGlyphs = kha_graphics2_Graphics.fontGlyphs.slice();
 				}
 			}
 		}
@@ -38106,6 +37838,8 @@ kha_SystemImpl.estimatedRefreshRate = 60;
 kha_SystemImpl.minimumScroll = 999;
 kha_SystemImpl.lastFirstTouchX = 0;
 kha_SystemImpl.lastFirstTouchY = 0;
+kha_SystemImpl.lastCanvasClientWidth = -1;
+kha_SystemImpl.lastCanvasClientHeight = -1;
 kha_SystemImpl.iosSoundEnabled = false;
 kha_SystemImpl.soundEnabled = false;
 kha_SystemImpl.iosTouchs = [];
@@ -38145,6 +37879,7 @@ kha_netsync_ControllerBuilder.nextId = 0;
 zui_Themes.dark = { NAME : "Default Dark", WINDOW_BG_COL : -14079703, WINDOW_TINT_COL : -1, ACCENT_COL : -13027015, ACCENT_HOVER_COL : -12369085, ACCENT_SELECT_COL : -11513776, BUTTON_COL : -13092808, BUTTON_TEXT_COL : -1513499, BUTTON_HOVER_COL : -11974327, BUTTON_PRESSED_COL : -15000805, TEXT_COL : -1513499, LABEL_COL : -3618616, SEPARATOR_COL : -14671840, HIGHLIGHT_COL : -14656100, CONTEXT_COL : -14540254, PANEL_BG_COL : -12895429, FONT_SIZE : 13, ELEMENT_W : 100, ELEMENT_H : 24, ELEMENT_OFFSET : 4, ARROW_SIZE : 5, BUTTON_H : 22, CHECK_SIZE : 15, CHECK_SELECT_SIZE : 8, SCROLL_W : 9, TEXT_OFFSET : 8, TAB_W : 6, FILL_WINDOW_BG : false, FILL_BUTTON_BG : true, FILL_ACCENT_BG : false, LINK_STYLE : 0, FULL_TABS : false};
 zui_Zui.alwaysRedrawWindow = true;
 zui_Zui.keyRepeat = true;
+zui_Zui.dynamicGlyphLoad = true;
 zui_Zui.touchControls = false;
 zui_Zui.keyRepeatTime = 0.0;
 zui_Zui.textToPaste = "";
