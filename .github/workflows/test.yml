@@ -15,7 +15,6 @@ jobs:
         with:
           build: html5
           blend: jenga.blend
-          blender: latest/stable
   krom:
     runs-on: ubuntu-latest
     steps:
@@ -26,7 +25,6 @@ jobs:
         with:
           build: krom-linux
           blend: jenga.blend
-          blender: latest/stable
   linux:
     runs-on: ubuntu-latest
     steps:
@@ -37,4 +35,3 @@ jobs:
         with:
           build: linux-hl
           blend: jenga.blend
-          blender: latest/stable
