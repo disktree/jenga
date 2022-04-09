@@ -9,17 +9,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build html5
-        uses: armory3d/armory_gh_actions@v0.1.10
+        uses: armory3d/armory_gh_actions@v0.1.12
         with:
           publish: html5
           blend: jenga.blend
       - name: Deploy html5 to gh-pages
-        uses: JamesIves/github-pages-deploy-action@4.1.5
+        uses: JamesIves/github-pages-deploy-action@4.3.0
         with:
           branch: gh-pages
           folder: build_jenga/html5
       - name: Buid krom-linux
-        uses: armory3d/armory_gh_actions@v0.1.10
+        uses: armory3d/armory_gh_actions@v0.1.12
         with:
           publish: krom-linux
           blend: jenga.blend
@@ -28,4 +28,3 @@ jobs:
         with:
           name: krom-linux
           path: build_jenga/krom-linux
-       
