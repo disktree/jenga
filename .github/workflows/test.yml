@@ -11,7 +11,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Html5
         id: html5
-        uses: armory3d/armory_gh_actions@v0.1.10
+        uses: armory3d/armory_gh_actions@v0.1.13
         with:
           build: html5
           blend: jenga.blend
@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Krom
         id: krom
-        uses: armory3d/armory_gh_actions@v0.1.10
+        uses: armory3d/armory_gh_actions@v0.1.13
         with:
           build: krom-linux
           blend: jenga.blend
@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Linux
         id: linux
-        uses: armory3d/armory_gh_actions@v0.1.10
+        uses: armory3d/armory_gh_actions@v0.1.13
         with:
           build: linux-hl
           blend: jenga.blend
