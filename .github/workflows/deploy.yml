@@ -7,24 +7,24 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Build html5
-        uses: armory3d/armory_gh_actions@v0.1.13
+        uses: armory3d/armory_gh_actions@v0.1.14
         with:
           publish: html5
           blend: jenga.blend
       - name: Deploy html5 to gh-pages
-        uses: JamesIves/github-pages-deploy-action@v4.3.0
+        uses: JamesIves/github-pages-deploy-action@v4.4.0
         with:
           branch: gh-pages
           folder: build_jenga/html5
       - name: Buid krom-linux
-        uses: armory3d/armory_gh_actions@v0.1.13
+        uses: armory3d/armory_gh_actions@v0.1.14
         with:
           publish: krom-linux
           blend: jenga.blend
       - name: Store krom-linux artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: krom-linux
           path: build_jenga/krom-linux

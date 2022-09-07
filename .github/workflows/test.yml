@@ -8,30 +8,30 @@ jobs:
   html5:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Html5
         id: html5
-        uses: armory3d/armory_gh_actions@v0.1.13
+        uses: armory3d/armory_gh_actions@v0.1.14
         with:
           build: html5
           blend: jenga.blend
   krom:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Krom
         id: krom
-        uses: armory3d/armory_gh_actions@v0.1.13
+        uses: armory3d/armory_gh_actions@v0.1.14
         with:
           build: krom-linux
           blend: jenga.blend
   linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Linux
         id: linux
-        uses: armory3d/armory_gh_actions@v0.1.13
+        uses: armory3d/armory_gh_actions@v0.1.14
         with:
           build: linux-hl
           blend: jenga.blend
