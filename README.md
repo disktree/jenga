@@ -1,4 +1,4 @@
-[JENGA!](http://disktree.net/app/games/jenga/)
+[JENGA!](https://disktree.github.io/jenga/)
 ======
 Fucking jenga tower.
 
