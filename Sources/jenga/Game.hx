@@ -35,7 +35,7 @@ class Game extends iron.Trait {
         notifyOnInit( () -> {
             trace(Scene.active.world.raw.probe.strength);
             #if kha_html5
-            Scene.active.world.raw.probe.strength = 1.5; //0.2; // HACK
+            //Scene.active.world.raw.probe.strength = 1.5; //0.2; // HACK
             #end
             cam = Scene.active.camera;
             camRigZ = Scene.active.getEmpty('CameraRigZ');
